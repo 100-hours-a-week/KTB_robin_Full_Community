@@ -1,6 +1,7 @@
-package ktb3.fullstack.week4.common.error;
+package ktb3.fullstack.week4.common.error.codes;
 
 
+import ktb3.fullstack.week4.common.error.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum AuthError implements ErrorCode {
