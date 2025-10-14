@@ -1,4 +1,4 @@
-package ktb3.fullstack.week4.common.error.handler;
+package ktb3.fullstack.week4.api.advice;
 
 import ktb3.fullstack.week4.common.error.codes.ErrorCode;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
