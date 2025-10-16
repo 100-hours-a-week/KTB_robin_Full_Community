@@ -32,8 +32,7 @@ public class UserService {
 
     // 닉네임 변경: 존재 확인 → 저장소 갱신
     public NicknameUpdateResponse changeNickname(long userId, NicknameUpdateRequest dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
+        User user = checkCanNotFoundUser(userId);
 
         String newNickname = dto.getNewNickname();
         String oldNickname = user.getNickname();
@@ -45,8 +44,7 @@ public class UserService {
 
     // 비밀번호 변경: 존재 확인 → 해시 적용 → 저장(향후 Store/Repository 메서드 추가 시 연결)
     public void changePassword(long userId, PasswordUpdateRequest newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
+        User user = checkCanNotFoundUser(userId);
         // TODO: passwordEncoder.encode(newPassword) 등 해시화 후 저장소 반영 메서드 호출
         String hashedPassword = passwordHasher.hash(newPassword.getNewPassword());
         user.changePassword(hashedPassword);
@@ -55,8 +53,19 @@ public class UserService {
 
     // 프로필 이미지 변경: 존재 확인 후 저장(향후 Store/Repository 메서드 추가 시 연결)
     public void changeProfileImage(long userId, String newProfileImageUrl) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
+        checkCanNotFoundUser(userId);
         // TODO: userRepository.updateImage(userId, newProfileImageUrl);
+    }
+
+    // 회원 탈퇴 : 사용자 삭제
+    public void withdrawMemberShip(long userId) {
+        checkCanNotFoundUser(userId);
+        userRepository.deleteById(userId);
+    }
+
+    private User checkCanNotFoundUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
+        return user;
     }
 }

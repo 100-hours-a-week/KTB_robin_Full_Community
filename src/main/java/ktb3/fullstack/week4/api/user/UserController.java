@@ -44,4 +44,11 @@ public class UserController {
         userService.changePassword(userId, dto);
         return ApiResponse.ok("password_edit_success");
     }
+
+    @DeleteMapping
+    public ApiResponse<Void> withdrawMemberShip(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
+        userService.withdrawMemberShip(userId);
+        return ApiResponse.ok("membership_withdraw_success");
+    }
 }
