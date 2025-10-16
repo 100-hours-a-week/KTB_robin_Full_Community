@@ -7,6 +7,7 @@ import ktb3.fullstack.week4.auth.JwtTokenProvider;
 import ktb3.fullstack.week4.common.error.codes.AuthError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
+import ktb3.fullstack.week4.common.security.PasswordHasher;
 import ktb3.fullstack.week4.common.util.CookieUtil;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.auth.LoginResponse;
@@ -29,6 +30,7 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final RefreshTokenStore refreshTokenStore;
     private final UserRepository userRepository;
+    private final PasswordHasher passwordHasher;
 
     public LoginResponse login(@Valid LoginRequest dto, HttpServletResponse response) {
         if (dto.getEmail() == null || dto.getPassword() == null) {
@@ -39,8 +41,8 @@ public class AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD));
 
-        // TODO: 이후 BCrypt로 교체. 지금은 단순 비교
-        if (!dto.getPassword().equals(user.getPassword())) {
+        String hashedPassword = passwordHasher.hash(dto.getPassword());
+        if (!hashedPassword.equals(user.getPassword())) {
             throw new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD);
         }
 

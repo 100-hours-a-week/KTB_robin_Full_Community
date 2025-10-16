@@ -45,12 +45,9 @@ public class UserRepository implements CrudRepository<User, Long> {
         store.updateNickName(user, oldNickname);
     }
 
-
-//    public void updatePassword(long userId, String newPasswordHashed) {
-//        User user = store.get(userId).orElseThrow(() ->
-//                new ApiException(UserError.CANNOT_FOUND_USER));
-//
-//    }
+    public void updatePassword(User user) {
+        store.updatePassword(user);
+    }
 
 //    public void updateImage(long userId, String newProfileImageUrl) {
 //

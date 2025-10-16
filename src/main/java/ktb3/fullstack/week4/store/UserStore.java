@@ -50,6 +50,10 @@ public class UserStore {
         nicknameIndex.put(user.getNickname(), user.getId());
     }
 
+    public void updatePassword(User user) {
+        userMap.put(user.getId(), user);
+    }
+
     public boolean remove(Long id) {
         User removed = userMap.remove(id);
         if (removed == null) return false;
