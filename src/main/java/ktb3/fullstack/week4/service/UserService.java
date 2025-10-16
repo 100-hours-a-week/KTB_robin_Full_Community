@@ -17,13 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     // 회원 가입: 비즈니스 검증(중복) → 저장
     public void register(JoinRequest dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ApiException(UserError.EXISTING_EMAIL);
-        }
-        if (userRepository.existsByNickname(dto.getNickname())) {
-            throw new ApiException(UserError.EXISTING_NICKNAME);
-        }
-
+        // 이메일, 닉네임 가용성 체크는 UserController 가 AvailabilityService 에 위임
         User user = new User();
         user.setEmail(dto.getEmail());
         // TODO: 비밀번호 해시는 이 단계에서 적용(예: BCrypt) 후 저장
@@ -34,17 +28,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 닉네임 변경: 존재 확인 → 검증 → 저장소 갱신
+    // 닉네임 변경: 존재 확인 → 저장소 갱신
     public NicknameUpdateResponse changeNickname(long userId, NicknameUpdateRequest dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
 
         String newNickname = dto.getNewNickname();
         String oldNickname = user.getNickname();
-        if (newNickname.equals(oldNickname)
-                || userRepository.existsByNickname(newNickname)) {
-            throw new ApiException(UserError.EXISTING_NICKNAME);
-        }
+        // 닉네임 가용성 체크는 UserController 가 AvailabilityService 에 위임
         user.changeNickName(newNickname);
         userRepository.updateNickname(user, oldNickname);
         return new NicknameUpdateResponse(newNickname);
