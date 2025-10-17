@@ -38,12 +38,13 @@ public class UserStore {
         return nicknameIndex.containsKey(nickname);
     }
 
+    // 실제 저장소에 엔티티 삽입
     public void put(User user) {
         userMap.put(user.getId(), user);
         emailIndex.put(user.getEmail(), user.getId());
         nicknameIndex.put(user.getNickname(), user.getId());
     }
-
+    
     public void updateNickName(User user, String oldNickname) {
         userMap.put(user.getId(), user);
         nicknameIndex.remove(oldNickname);
@@ -51,6 +52,14 @@ public class UserStore {
     }
 
     public void updatePassword(User user) {
+        userMap.put(user.getId(), user);
+    }
+
+    public void updateProfileImage(User user) {
+        userMap.put(user.getId(), user);
+    }
+
+    public void deleteProfileImage(User user) {
         userMap.put(user.getId(), user);
     }
 
@@ -68,5 +77,4 @@ public class UserStore {
         if (id == null) return Optional.empty();
         return Optional.ofNullable(userMap.get(id));
     }
-
 }

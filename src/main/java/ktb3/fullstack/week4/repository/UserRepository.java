@@ -1,7 +1,6 @@
 package ktb3.fullstack.week4.repository;
 
 import ktb3.fullstack.week4.common.error.codes.GenericError;
-import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.store.UserStore;
@@ -49,9 +48,13 @@ public class UserRepository implements CrudRepository<User, Long> {
         store.updatePassword(user);
     }
 
-//    public void updateImage(long userId, String newProfileImageUrl) {
-//
-//    }
+    public void updateProfileImage(User user) {
+        store.updateProfileImage(user);
+    }
+
+    public void deleteProfileImage(User user) {
+        store.deleteProfileImage(user);
+    }
 
     @Override
     public Optional<User> findById(Long id) {
