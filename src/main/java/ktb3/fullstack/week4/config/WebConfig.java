@@ -31,8 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/auth/**",
                         "/availability/**",
-                        "/users",            // 회원가입
-                        "/posts/*",          // 상세조회는 현재 명세상 인증 필요 → 필요 시 제외 해제
+                        "/users",
                         "/error"
                 );
     }
