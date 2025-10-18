@@ -103,10 +103,90 @@ public class PostService {
         return new PostListResponse(briefs, nextCursor, hasNext);
     }
 
-//    // 게시글 상세조회
-//    public PostDetailResponse getSinglePostDeatil(long userId, long postId) {
-//
-//    }
+
+
+    // 게시글 좋아요
+    public void likePost(long userId, long postId) {
+        checkCanNotFoundUser(userId);
+        Post post = checkCanNotFoundPost(postId);
+        likeRepository.like(post.getId(), userId);
+    }
+
+    // 게시글 좋아요 취소
+    public void unlikePost(long userId, long postId) {
+        checkCanNotFoundUser(userId);
+        Post post = checkCanNotFoundPost(postId);
+        likeRepository.unlike(post.getId(), userId);
+    }
+
+    // 댓글 등록
+    public void addComment(long userId, long postId, String content) {
+        checkCanNotFoundUser(userId);
+        Post post = checkCanNotFoundPost(postId);
+        if (content == null || content.isBlank()) {
+            throw new ApiException(GenericError.INVALID_REQUEST);
+        }
+        commentRepository.addComment(post.getId(), userId, content);
+    }
+
+    // 댓글 수정
+    public void editComment(long userId, long postId, long commentId, String content) {
+        checkCanNotFoundUser(userId);
+        checkCanNotFoundPost(postId);
+        if (content == null || content.isBlank()) {
+            throw new ApiException(GenericError.INVALID_REQUEST);
+        }
+
+        // 존재/소유 확인을 위해 먼저 조회
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        Comment target = null;
+        for (Comment c : comments) {
+            if (c.getId() == commentId) {
+                target = c;
+                break;
+            }
+        }
+        if (target == null) {
+            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
+        }
+        if (target.getAuthorId() != userId) {
+            throw new ApiException(CommentError.CANNOT_EDIT_OTHERS_COMMENT);
+        }
+
+        boolean ok = commentRepository.editComment(postId, commentId, userId, content);
+        if (!ok) {
+            // 이 경우는 동시성 등으로 수정 실패한 예외 케이스
+            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
+        }
+    }
+
+    // 댓글 삭제
+    public void removeComment(long userId, long postId, long commentId) {
+        checkCanNotFoundUser(userId);
+        checkCanNotFoundPost(postId);
+
+        // 존재/소유 확인을 위해 먼저 조회
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        Comment target = null;
+        for (Comment comment : comments) {
+            if (comment.getId() == commentId) {
+                target = comment;
+                break;
+            }
+        }
+
+        if (target == null) {
+            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
+        }
+        if (target.getAuthorId() != userId) {
+            throw new ApiException(CommentError.CANNOT_DELETE_OTHERS_COMMENT);
+        }
+
+        boolean ok = commentRepository.deleteComment(postId, commentId, userId);
+        if (!ok) {
+            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
+        }
+    }
 
     private User checkCanNotFoundUser(long userId) {
         User user = userRepository.findById(userId)
