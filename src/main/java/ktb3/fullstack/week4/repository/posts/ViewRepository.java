@@ -10,12 +10,11 @@ public class ViewRepository implements PostSocialInfoRepository {
     private final ViewStore viewStore;
 
     @Override
-    public long plusCount(long postId) {
-        return viewStore.increment(postId);
-    }
-
-    @Override
     public long countByPostId(long postId) {
         return viewStore.getCount(postId);
+    }
+
+    public long plusViewCount(long postId) {
+        return viewStore.increment(postId);
     }
 }
