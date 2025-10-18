@@ -1,9 +1,13 @@
 package ktb3.fullstack.week4.service;
 
+import ktb3.fullstack.week4.common.error.codes.CommentError;
+import ktb3.fullstack.week4.common.error.codes.GenericError;
+import ktb3.fullstack.week4.common.error.codes.PostError;
 import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.image.ImageProcessor;
 import ktb3.fullstack.week4.domain.posts.Post;
+import ktb3.fullstack.week4.domain.posts.Comment;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
