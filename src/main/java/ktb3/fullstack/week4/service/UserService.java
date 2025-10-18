@@ -10,7 +10,7 @@ import ktb3.fullstack.week4.dto.users.NicknameUpdateRequest;
 import ktb3.fullstack.week4.dto.users.NicknameUpdateResponse;
 import ktb3.fullstack.week4.dto.users.PasswordUpdateRequest;
 import ktb3.fullstack.week4.repository.UserRepository;
-import ktb3.fullstack.week4.store.ImageStore;
+import ktb3.fullstack.week4.store.images.ProfileImageStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,16 +22,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
     private final ImageProcessor imageProcessor;
-    private final ImageStore imageStore;
+    private final ProfileImageStore profileImageStore;
 
     public void register(JoinRequest dto) {
         // 이메일, 닉네임 가용성 체크는 UserController 가 AvailabilityService 에 위임
-        User user = new User();
-        user.setEmail(dto.getEmail());
         String hashedPassword = passwordHasher.hash(dto.getPassword());
-        user.setPassword(hashedPassword);
-        user.setNickname(dto.getNickname());
-        user.setProfileImageUrl(dto.getProfileImageUrl());
+        User user = new User(
+                0L,
+                dto.getEmail(),
+                hashedPassword,
+                dto.getNickname(),
+                dto.getProfileImageUrl()
+        );
         userRepository.save(user);
     }
 
@@ -50,7 +52,6 @@ public class UserService {
     // 비밀번호 변경: 존재 확인 → 해시 적용 → 저장(향후 Store/Repository 메서드 추가 시 연결)
     public void changePassword(long userId, PasswordUpdateRequest newPassword) {
         User user = checkCanNotFoundUser(userId);
-        // TODO: passwordEncoder.encode(newPassword) 등 해시화 후 저장소 반영 메서드 호출
         String hashedPassword = passwordHasher.hash(newPassword.getNewPassword());
         user.changePassword(hashedPassword);
         userRepository.updatePassword(user);
@@ -66,9 +67,9 @@ public class UserService {
         */
         byte[] imageByte = imageProcessor.toByteStream(newProfileImage);
         String profileImageUrl = imageProcessor.makeRandomImageUrl();
-        imageStore.updateImage(profileImageUrl, imageByte);
+        profileImageStore.uploadImage(profileImageUrl, imageByte);
 
-        user.setProfileImageUrl(profileImageUrl);
+        user.changeProfileImage(profileImageUrl);
         userRepository.updateProfileImage(user);
         return profileImageUrl;
     }
@@ -77,8 +78,8 @@ public class UserService {
     public String deleteProfileImage(long userId) {
         User user = checkCanNotFoundUser(userId);
         String existingProfileImageUrl = user.getProfileImageUrl();
-        user.setProfileImageUrl(null);
-        imageStore.deleteImage(existingProfileImageUrl);
+        user.changeProfileImage(null);
+        profileImageStore.deleteImage(existingProfileImageUrl);
         userRepository.deleteProfileImage(user);
         return existingProfileImageUrl;
     }
