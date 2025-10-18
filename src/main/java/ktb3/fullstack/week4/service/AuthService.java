@@ -41,8 +41,7 @@ public class AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD));
 
-        String hashedPassword = passwordHasher.hash(dto.getPassword());
-        if (!hashedPassword.equals(user.getPassword())) {
+        if (!passwordHasher.matches(dto.getPassword(), user.getPassword())) {
             throw new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD);
         }
 
