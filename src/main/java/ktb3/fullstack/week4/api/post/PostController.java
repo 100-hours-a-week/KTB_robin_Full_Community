@@ -38,14 +38,37 @@ public class PostController {
         return ApiResponse.ok(response, "posts_fetch_success");
     }
 
-//    // 게시글 상세 조회
-//    @GetMapping("/{id}")
-//    public ApiResponse<PostDetailResponse> getPostDetail(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @PathVariable(value = "id") long postId) {
-//        PostDetailResponse response = postService.getSinglePostDeatil(userId, postId);
-//        return ApiResponse.ok(response, "post_fetch_success");
-//    }
+    // 게시글 상세 조회
+    @GetMapping("/{id}")
+    public ApiResponse<PostDetailResponse> getPostDetail(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable(value = "id") long postId) {
+        PostDetailResponse response = postService.getSinglePostDeatil(userId, postId);
+        return ApiResponse.ok(response, "post_fetch_success");
+    }
+
+    // 게시글 수정
+    // Content-Type: multipart/form-data
+    @PatchMapping("/{id}")
+    public ApiResponse<Void> editPost(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("id") long postId,
+            @Valid @RequestPart PostUploadRequeset dto,
+            @RequestPart(required = false) MultipartFile image) {
+        postService.editPost(userId, postId, dto, image);
+        return ApiResponse.ok("post_edit_success");
+    }
+
+
+    // 게시글 삭제
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> removePost(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("id") long postId) {
+        postService.removePost(userId, postId);
+        return ApiResponse.ok("post_remove_success");
+    }
+
 
     // 게시글 좋아요
     @PostMapping("/{id}/likes")
