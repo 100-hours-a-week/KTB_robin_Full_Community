@@ -47,70 +47,55 @@ public class PostController {
 //        return ApiResponse.ok(response, "post_fetch_success");
 //    }
 
-//
-//    // 게시글 수정
-//    // Content-Type: multipart/form-data
-//    @PatchMapping("/{id}")
-//    public ApiResponse<Void> editPost(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @Valid @RequestBody PostUploadRequeset dto) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 삭제
-//    @DeleteMapping("/{id}")
-//    public ApiResponse<Void> removePost(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @Valid @RequestBody PostUploadRequeset dto) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 좋아요
-//    @PostMapping("/{id}/likes")
-//    public ApiResponse<Void> addLike(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @Valid @RequestBody PostUploadRequeset dto) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 좋아요 취소
-//    @DeleteMapping("/{id}/likes")
-//    public ApiResponse<Void> removeLike(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @Valid @RequestBody PostUploadRequeset dto) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 댓글 등록
-//    @PostMapping("/{postId}/comments")
-//    public ApiResponse<Void> addComment(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @PathVariable("postId") long postId) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 댓글 수정
-//    @PatchMapping("/{postId}/{commentId}")
-//    public ApiResponse<Void> editComment(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @PathVariable("postId") long postId,
-//            @PathVariable("postId") long commentId) {
-//
-//        return ApiResponse.ok();
-//    }
-//
-//    // 게시글 댓글 삭제
-//    @DeleteMapping("/{postId}/{commentId}")
-//    public ApiResponse<Void> removeComment(
-//            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-//            @PathVariable("postId") long postId,
-//            @PathVariable("postId") long commentId) {
-//
-//        return ApiResponse.ok();
-//    }
+    // 게시글 좋아요
+    @PostMapping("/{id}/likes")
+    public ApiResponse<Void> addLike(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("id") long postId) {
+        postService.likePost(userId, postId);
+        return ApiResponse.ok("post_like_success");
+    }
+
+
+    // 게시글 좋아요 취소
+    @DeleteMapping("/{id}/likes")
+    public ApiResponse<Void> removeLike(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("id") long postId) {
+        postService.unlikePost(userId, postId);
+        return ApiResponse.ok("post_unlike_success");
+    }
+
+
+    // 게시글 댓글 등록
+    @PostMapping("/{postId}/comments")
+    public ApiResponse<Void> addComment(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("postId") long postId,
+            @RequestParam("content") String content) {
+        postService.addComment(userId, postId, content);
+        return ApiResponse.ok("comment_add_success");
+    }
+
+    // 게시글 댓글 수정
+    @PatchMapping("/{postId}/comments/{commentId}")
+    public ApiResponse<Void> editComment(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("postId") long postId,
+            @PathVariable("commentId") long commentId,
+            @RequestParam("content") String content) {
+        postService.editComment(userId, postId, commentId, content);
+        return ApiResponse.ok("comment_edit_success");
+    }
+
+    // 게시글 댓글 삭제
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ApiResponse<Void> removeComment(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @PathVariable("postId") long postId,
+            @PathVariable("commentId") long commentId) {
+        postService.removeComment(userId, postId, commentId);
+        return ApiResponse.ok("comment_remove_success");
+    }
+
 }
