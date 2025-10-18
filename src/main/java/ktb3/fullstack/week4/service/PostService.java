@@ -103,6 +103,117 @@ public class PostService {
         return new PostListResponse(briefs, nextCursor, hasNext);
     }
 
+    // 게시글 상세조회
+    public PostDetailResponse getSinglePostDeatil(long userId, long postId) {
+        checkCanNotFoundUser(userId);
+
+        if (postId <= 0) {
+            throw new ApiException(GenericError.INVALID_REQUEST);
+        }
+        Post post = checkCanNotFoundPost(postId);
+
+        // 조회수 증가 정책: 상세 조회 시 1 증가
+        viewRepository.plusViewCount(postId);
+
+        User authorEntity = checkCanNotFoundUser(post.getAuthorId());
+        String author = authorEntity.getNickname();
+
+        // 숫자 정보
+        long likes = likeRepository.countByPostId(postId);
+        long commentsCount = commentRepository.countByPostId(postId);
+        long views = viewRepository.countByPostId(postId);
+
+        // (사용자 - 현재 조회중인 게시물) 좋아요 누름 여부
+        boolean isLiked = likeRepository.isLiked(postId, userId);
+
+        // 댓글 상세 목록 조회 + dto 매핑
+        List<Comment> commentEntities = commentRepository.findByPostId(postId);
+        List<PostDetailResponse.CommentInfo> comments = new ArrayList<>();
+        for (Comment comment : commentEntities) {
+            User commentAuthorEntity = checkCanNotFoundUser(comment.getAuthorId());
+            String commentAuthor = commentAuthorEntity.getNickname();
+
+            comments.add(new PostDetailResponse.CommentInfo(
+                            comment.getId(),
+                            commentAuthor,
+                            comment.getContent(),
+                            comment.getModifiedAt()
+                    )
+            );
+        }
+
+        PostDetailResponse.PostInfo postInfo = new PostDetailResponse.PostInfo(
+                post.getId(),
+                post.getTitle(),
+                likes,
+                commentsCount,
+                views,
+                author,
+                post.getModifiedAt(),
+                post.getImageUrl(),
+                post.getContent()
+        );
+
+        return new PostDetailResponse(postInfo, isLiked, comments);
+    }
+
+    // 게시글 수정
+    public void editPost(long userId, long postId, PostUploadRequeset dto, MultipartFile image) {
+        checkCanNotFoundUser(userId);
+
+        Post post = checkCanNotFoundPost(postId);
+
+        // 작성자 본인 여부 확인
+        checkCanNotEditOthersPost(userId, post.getAuthorId());
+
+        // 제목/본문 수정
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+
+        // 이미지 수정: 새 이미지가 있을 때만 교체
+        if (image != null && !image.isEmpty()) {
+            // 기존 이미지 삭제
+            String existingUrl = post.getImageUrl();
+            if (existingUrl != null) {
+                postImageStore.deleteImage(existingUrl);
+            }
+            // 새 이미지 업로드
+            byte[] imageBytes = imageProcessor.toByteStream(image);
+            String newUrl = imageProcessor.makeRandomImageUrl();
+            postImageStore.uploadImage(newUrl, imageBytes);
+            post.setImageUrl(newUrl);
+        }
+
+        // 수정 시각 갱신
+        post.setModifiedAt(LocalDateTime.now());
+
+        // 저장
+        postRepository.update(post);
+    }
+
+    // 게시글 삭제
+    public void removePost(long userId, long postId) {
+        checkCanNotFoundUser(userId);
+
+        Post post = checkCanNotFoundPost(postId);
+
+        // 본인 소유 확인
+        checkCanNotDeleteOthersPost(userId, post.getAuthorId());
+
+        // 게시글 이미지가 있다면 함께 정리
+        String imageUrl = post.getImageUrl();
+        if (imageUrl != null) {
+            try {
+                postImageStore.deleteImage(imageUrl);
+            } catch (Exception ignore) {}
+        }
+
+        // 인메모리에서 삭제
+        boolean deleted = postRepository.deleteById(postId);
+        if (!deleted) {
+            throw new ApiException(PostError.CANNOT_FOUND_POST);
+        }
+    }
 
 
     // 게시글 좋아요
