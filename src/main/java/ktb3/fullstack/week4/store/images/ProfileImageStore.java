@@ -6,14 +6,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class ImageStore {
+public class ProfileImageStore implements ImageStore{
     private final Map<String, byte[]> profileImageMap = new ConcurrentHashMap<>();
 
-    public void updateImage(String profileImageUrl, byte[] imageByte) {
+    // 프로필 사진의 등록/수정 겸용 메소드
+    @Override
+    public void uploadProfileImage(String profileImageUrl, byte[] imageByte) {
         profileImageMap.put(profileImageUrl, imageByte);
     }
 
-    public void deleteImage(String existingProfileImageUrl) {
+    @Override
+    public void deleteProfileImage(String existingProfileImageUrl) {
         profileImageMap.remove(existingProfileImageUrl);
     }
 }
