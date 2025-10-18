@@ -30,8 +30,8 @@ public class PostRepository implements CrudRepository<Post, Long> {
     }
 
     @Override
-    public Optional<Post> findById(Long aLong) {
-        return Optional.empty();
+    public Optional<Post> findById(Long id) {
+        return Optional.ofNullable(postStore.get(id));
     }
 
     @Override
@@ -40,12 +40,12 @@ public class PostRepository implements CrudRepository<Post, Long> {
     }
 
     @Override
-    public boolean deleteById(Long aLong) {
-        return false;
+    public boolean deleteById(Long id) {
+        return postStore.remove(id) != null;
     }
 
     @Override
-    public boolean existsById(Long aLong) {
+    public boolean existsById(Long id) {
         return false;
     }
 
@@ -64,9 +64,15 @@ public class PostRepository implements CrudRepository<Post, Long> {
         return result;
     }
 
+    // 게시글 업데이트
+    public Post update(Post entity) {
+        Post existing = postStore.get(entity.getId());
+        if (existing == null) {
+            throw new ApiException(GenericError.INVALID_REQUEST);
+        }
+        postStore.put(entity);
+        return entity;
+    }
 
-//    public Post update(Post entity) {
-//        Post existing = postStore.get(entity.getId());
-//    }
 
 }
