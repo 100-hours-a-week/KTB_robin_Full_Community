@@ -113,4 +113,22 @@ public class PostService {
                 .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
         return user;
     }
+
+    private Post checkCanNotFoundPost(long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(PostError.CANNOT_FOUND_POST));
+        return post;
+    }
+
+    private void checkCanNotEditOthersPost(long userId, long authorId) {
+        if(userId != authorId) {
+            throw new ApiException(PostError.CANNOT_EDIT_OTHERS_POST);
+        }
+    }
+
+    private void checkCanNotDeleteOthersPost(long userId, long authorId) {
+        if(userId != authorId) {
+            throw new ApiException(PostError.CANNOT_DELETE_OTHERS_POST);
+        }
+    }
 }
