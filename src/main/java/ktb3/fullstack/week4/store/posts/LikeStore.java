@@ -7,8 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class LikeStore implements PostSocialInfoStore{
-    private final Map<Long, AtomicLong> likesByPostId = new ConcurrentHashMap<>();
+public class LikeStore {
+
+    // key: postId
+    // value: 좋아요 누른 userId 집합
+    private final Map<Long, Set<Long>> likedUsersByPostId = new ConcurrentHashMap<>();
 
     @Override
     public long increment(long postId) {
