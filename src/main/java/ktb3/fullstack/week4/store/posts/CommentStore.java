@@ -7,8 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class CommentStore implements PostSocialInfoStore {
-    private final Map<Long, AtomicLong> commentsByPostId = new ConcurrentHashMap<>();
+public class CommentStore {
+    private final Map<Long, List<Comment>> commentsByPostIdMap = new ConcurrentHashMap<>();
+    private final AtomicLong seq = new AtomicLong(0);
 
     @Override
     public long increment(long postId) {
