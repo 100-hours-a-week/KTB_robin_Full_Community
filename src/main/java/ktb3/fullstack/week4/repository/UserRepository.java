@@ -7,7 +7,6 @@ import ktb3.fullstack.week4.store.UserStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -62,17 +61,8 @@ public class UserRepository implements CrudRepository<User, Long> {
     }
 
     @Override
-    public List<User> findAll() {
-        return store.values();
-    }
-
-    @Override
     public boolean deleteById(Long id) {
         return store.remove(id);
     }
 
-    @Override
-    public boolean existsById(Long id) {
-        return store.get(id).isPresent();
-    }
 }
