@@ -62,6 +62,10 @@ public class PostService {
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
+        // 이미 존재하는 유저라면
+        if(post.getId() != 0) {
+            throw new ApiException(GenericError.INVALID_REQUEST);
+        }
 
         postRepository.save(post);
     }

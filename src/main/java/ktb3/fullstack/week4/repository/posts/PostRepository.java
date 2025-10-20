@@ -20,9 +20,6 @@ public class PostRepository implements CrudRepository<Post, Long> {
 
     @Override
     public Post save(Post entity) {
-        if(entity.getId() != 0) {
-            throw new ApiException(GenericError.INVALID_REQUEST);
-        }
         long id = postStore.nextId();
         entity.setId(id);
         postStore.put(entity);
