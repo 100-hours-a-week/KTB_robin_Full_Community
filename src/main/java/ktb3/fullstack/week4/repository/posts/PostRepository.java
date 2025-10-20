@@ -32,19 +32,10 @@ public class PostRepository implements CrudRepository<Post, Long> {
     }
 
     @Override
-    public List<Post> findAll() {
-        return List.of();
-    }
-
-    @Override
     public boolean deleteById(Long id) {
         return postStore.remove(id) != null;
     }
 
-    @Override
-    public boolean existsById(Long id) {
-        return false;
-    }
 
     // 목록 조회 (id가 from - to)
     public List<Post> findPosts(int from, int to) {
@@ -62,13 +53,12 @@ public class PostRepository implements CrudRepository<Post, Long> {
     }
 
     // 게시글 업데이트
-    public Post update(Post entity) {
+    public void update(Post entity) {
         Post existing = postStore.get(entity.getId());
         if (existing == null) {
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
         postStore.put(entity);
-        return entity;
     }
 
 

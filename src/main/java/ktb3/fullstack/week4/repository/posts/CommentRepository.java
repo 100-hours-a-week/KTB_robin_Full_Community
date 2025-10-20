@@ -18,8 +18,8 @@ public class CommentRepository implements PostSocialInfoRepository {
         return commentStore.getCount(postId);
     }
 
-    public Comment addComment(long postId, long authorId, String content) {
-        return commentStore.add(postId, authorId, content, LocalDateTime.now());
+    public void addComment(long postId, long authorId, String content) {
+        commentStore.add(postId, authorId, content, LocalDateTime.now());
     }
 
     public boolean editComment(long postId, long commentId, long authorId, String newContent) {
