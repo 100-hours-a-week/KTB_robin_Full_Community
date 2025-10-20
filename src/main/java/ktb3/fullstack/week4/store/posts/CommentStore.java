@@ -39,7 +39,6 @@ public class CommentStore {
         if (list == null) return false;
         for (Comment c : list) {
             if (c.getId() == commentId) {
-                if (c.getAuthorId() != authorId) return false;
                 c.setContent(newContent);
                 c.setModifiedAt(now);
                 return true;
@@ -51,7 +50,7 @@ public class CommentStore {
     public boolean remove(long postId, long commentId, long authorId) {
         List<Comment> list = commentsByPostIdMap.getOrDefault(postId, null);
         if (list == null) return false;
-        boolean removed = list.removeIf(c -> c.getId() == commentId && c.getAuthorId() == authorId);
+        boolean removed = list.removeIf(c -> c.getId() == commentId);
         if (list.isEmpty()) {
             commentsByPostIdMap.remove(postId);
         }
