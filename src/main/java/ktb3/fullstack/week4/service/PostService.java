@@ -1,9 +1,6 @@
 package ktb3.fullstack.week4.service;
 
-import ktb3.fullstack.week4.common.error.codes.CommentError;
-import ktb3.fullstack.week4.common.error.codes.GenericError;
-import ktb3.fullstack.week4.common.error.codes.PostError;
-import ktb3.fullstack.week4.common.error.codes.UserError;
+import ktb3.fullstack.week4.common.error.codes.*;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.image.ImageProcessor;
 import ktb3.fullstack.week4.domain.posts.Post;
@@ -211,14 +208,15 @@ public class PostService {
         // 게시글 이미지가 있다면 함께 정리
         String imageUrl = post.getImageUrl();
         if (imageUrl != null) {
-            try {
-                postImageStore.deleteImage(imageUrl);
-            } catch (Exception ignore) {}
+            byte[] previousImageInfo = postImageStore.deleteImage(imageUrl);
+            if(previousImageInfo == null) {
+                throw new ApiException(FileError.IMAGE_NOT_FOUND);
+            }
         }
 
         // 인메모리에서 삭제
-        boolean deleted = postRepository.deleteById(postId);
-        if (!deleted) {
+        boolean isPostDeleted = postRepository.deleteById(postId);
+        if (!isPostDeleted) {
             throw new ApiException(PostError.CANNOT_FOUND_POST);
         }
     }

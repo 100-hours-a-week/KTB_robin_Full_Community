@@ -16,7 +16,7 @@ public class PostImageStore implements ImageStore {
     }
 
     @Override
-    public void deleteImage(String existingPostImageUrl) {
-        postImageMap.remove(existingPostImageUrl);
+    public byte[] deleteImage(String existingPostImageUrl) {
+        return postImageMap.remove(existingPostImageUrl);
     }
 }
