@@ -4,7 +4,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
-import ktb3.fullstack.week4.common.error.codes.*;
+import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
+import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
+@CommonErrorResponses
+@AccessTokenExpireResponse
 public class PostController implements PostApi {
     private final PostService postService;
 

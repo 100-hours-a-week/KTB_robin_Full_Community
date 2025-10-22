@@ -1,5 +1,6 @@
 package ktb3.fullstack.week4.api.availability;
 
+import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.service.AvailabilityService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/availability")
 @RequiredArgsConstructor
+@CommonErrorResponses
 public class AvailabilityController implements AvailabilityApi {
     private final AvailabilityService availabilityService;
 

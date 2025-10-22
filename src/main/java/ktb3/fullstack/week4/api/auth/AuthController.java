@@ -1,6 +1,6 @@
 package ktb3.fullstack.week4.api.auth;
 
-import ktb3.fullstack.week4.config.swagger.AccessTokenExpireResponse;
+import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.auth.LoginResponse;
 import ktb3.fullstack.week4.dto.auth.LoginRequest;
 import ktb3.fullstack.week4.dto.auth.RefreshResponse;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@CommonErrorResponses
 public class AuthController implements AuthApi {
 
     private static final String REFRESH_COOKIE_NAME = "refresh_token";

@@ -2,6 +2,8 @@ package ktb3.fullstack.week4.api.user;
 
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
+import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
+import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.AvailabilityService;
@@ -13,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@CommonErrorResponses
 public class UserController implements UserApi {
 
     private final UserService userService;
@@ -28,6 +31,7 @@ public class UserController implements UserApi {
     }
 
     @Override
+    @AccessTokenExpireResponse
     @PatchMapping("/me/nickname") //회원정보 수정 - 닉네임
     public ApiResponse<NicknameUpdateResponse> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -38,6 +42,7 @@ public class UserController implements UserApi {
     }
 
     @Override
+    @AccessTokenExpireResponse
     @PatchMapping("/me/password") //회원정보 수정 - 비밀번호
     public ApiResponse<PasswordUpdateRequest> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -47,6 +52,7 @@ public class UserController implements UserApi {
     }
 
     @Override
+    @AccessTokenExpireResponse
     @DeleteMapping("/me")
     public ApiResponse<Void> withdrawMemberShip(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
@@ -55,6 +61,7 @@ public class UserController implements UserApi {
     }
 
     @Override
+    @AccessTokenExpireResponse
     @PatchMapping("/me/profile-image")
     public ApiResponse<ProfileImageUrlResponse> registerNewProfileImage(
             @RequestPart(value = "profile_image") MultipartFile newProfileImage,
@@ -67,6 +74,7 @@ public class UserController implements UserApi {
     }
 
     @Override
+    @AccessTokenExpireResponse
     @DeleteMapping("/me/profile-image")
     public ApiResponse<ProfileImageUrlResponse> removeProfileImage(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
