@@ -19,11 +19,10 @@ public class PostRepository implements CrudRepository<Post, Long> {
     private final PostStore postStore;
 
     @Override
-    public Post save(Post entity) {
+    public void save(Post entity) {
         long id = postStore.nextId();
         entity.setId(id);
         postStore.put(entity);
-        return entity;
     }
 
     @Override

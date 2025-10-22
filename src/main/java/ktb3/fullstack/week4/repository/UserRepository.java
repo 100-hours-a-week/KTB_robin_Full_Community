@@ -24,14 +24,13 @@ public class UserRepository implements CrudRepository<User, Long> {
     }
 
     @Override
-    public User save(User entity) {
+    public void save(User entity) {
         if (entity.getId() != 0) {
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
         long id = store.nextId();
         entity.setId(id);
         store.put(entity);
-        return entity;
     }
 
     // 이메일로 사용자 조회 (AuthService.login에서 사용)
