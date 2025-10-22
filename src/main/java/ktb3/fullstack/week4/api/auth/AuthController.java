@@ -1,5 +1,6 @@
 package ktb3.fullstack.week4.api.auth;
 
+import ktb3.fullstack.week4.config.swagger.AccessTokenExpireResponse;
 import ktb3.fullstack.week4.dto.auth.LoginResponse;
 import ktb3.fullstack.week4.dto.auth.LoginRequest;
 import ktb3.fullstack.week4.dto.auth.RefreshResponse;
@@ -14,26 +15,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private static final String REFRESH_COOKIE_NAME = "refresh_token";
 
     private final AuthService authService;
 
+    @Override
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest dto, HttpServletResponse response) {
         LoginResponse body = authService.login(dto, response);
         return ApiResponse.ok(body, "login_success");
     }
 
-
+    @Override
     @PostMapping("/refresh")
     public ApiResponse<RefreshResponse> refresh(HttpServletRequest request) {
         RefreshResponse body = authService.refresh(request);
         return ApiResponse.ok(body, "access_token_refreshed");
     }
 
-
+    @Override
     @PostMapping("/logout")
     public ApiResponse<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);

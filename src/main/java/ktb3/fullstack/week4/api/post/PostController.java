@@ -1,34 +1,49 @@
 package ktb3.fullstack.week4.api.post;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
+import ktb3.fullstack.week4.common.error.codes.*;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import ktb3.fullstack.week4.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostApi {
     private final PostService postService;
 
-    // 게시글 등록
-    // Content-Type: multipart/form-data
-    @PostMapping
+    @Override
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> uploadPost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @Parameter(
+                    name = "dto",
+                    description = "게시글 내용(JSON)",
+                    required = true,
+                    content = @Content(mediaType = "application/json")
+            )
             @Valid @RequestPart PostUploadRequeset dto,
-            @RequestPart MultipartFile image) {
+            @Parameter(
+                    name = "image",
+                    description = "게시글 이미지 파일(선택)",
+                    required = false,
+                    content = @Content(mediaType = "multipart/form-data")
+            )
+            @RequestPart(required = false) MultipartFile image) {
             postService.uploadPost(userId, dto, image);
             return ApiResponse.ok("post_upload_success");
     }
 
-    // 게시글 목록 조회
+    @Override
     @GetMapping // ?after=0&limit=5
     public ApiResponse<PostListResponse> getPostList(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -38,7 +53,7 @@ public class PostController {
         return ApiResponse.ok(response, "posts_fetch_success");
     }
 
-    // 게시글 상세 조회
+    @Override
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResponse> getPostDetail(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -47,8 +62,7 @@ public class PostController {
         return ApiResponse.ok(response, "post_fetch_success");
     }
 
-    // 게시글 수정
-    // Content-Type: multipart/form-data
+    @Override
     @PatchMapping("/{id}")
     public ApiResponse<Void> editPost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -60,7 +74,7 @@ public class PostController {
     }
 
 
-    // 게시글 삭제
+    @Override
     @DeleteMapping("/{id}")
     public ApiResponse<Void> removePost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -70,7 +84,7 @@ public class PostController {
     }
 
 
-    // 게시글 좋아요
+    @Override
     @PostMapping("/{id}/likes")
     public ApiResponse<Void> addLike(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -80,7 +94,7 @@ public class PostController {
     }
 
 
-    // 게시글 좋아요 취소
+    @Override
     @DeleteMapping("/{id}/likes")
     public ApiResponse<Void> removeLike(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -90,7 +104,7 @@ public class PostController {
     }
 
 
-    // 게시글 댓글 등록
+    @Override
     @PostMapping("/{postId}/comments")
     public ApiResponse<Void> addComment(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -100,7 +114,7 @@ public class PostController {
         return ApiResponse.ok("comment_add_success");
     }
 
-    // 게시글 댓글 수정
+    @Override
     @PatchMapping("/{postId}/comments/{commentId}")
     public ApiResponse<Void> editComment(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -111,7 +125,7 @@ public class PostController {
         return ApiResponse.ok("comment_edit_success");
     }
 
-    // 게시글 댓글 삭제
+    @Override
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ApiResponse<Void> removeComment(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,

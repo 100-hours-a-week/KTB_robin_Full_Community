@@ -13,12 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApi {
 
     private final UserService userService;
     private final AvailabilityService availabilityService;
 
-    @PostMapping //회원가입
+    @Override
+    @PostMapping
     public ApiResponse<Void> register(@Valid @RequestBody JoinRequest dto) {
         availabilityService.checkEmailAvailability(dto.getEmail());
         availabilityService.checkNicknameAvailability(dto.getNickname());
@@ -26,8 +27,9 @@ public class UserController {
         return ApiResponse.ok("register_success");
     }
 
+    @Override
     @PatchMapping("/me/nickname") //회원정보 수정 - 닉네임
-    public ApiResponse<NicknameUpdateResponse> changeNickName(
+    public ApiResponse<NicknameUpdateResponse> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @Valid @RequestBody NicknameUpdateRequest dto) {
         availabilityService.checkNicknameAvailability(dto.getNewNickname());
@@ -35,6 +37,7 @@ public class UserController {
         return ApiResponse.ok(result, "nickname_edit_success");
     }
 
+    @Override
     @PatchMapping("/me/password") //회원정보 수정 - 비밀번호
     public ApiResponse<PasswordUpdateRequest> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
@@ -43,6 +46,7 @@ public class UserController {
         return ApiResponse.ok("password_edit_success");
     }
 
+    @Override
     @DeleteMapping("/me")
     public ApiResponse<Void> withdrawMemberShip(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
@@ -50,9 +54,10 @@ public class UserController {
         return ApiResponse.ok("membership_withdraw_success");
     }
 
+    @Override
     @PatchMapping("/me/profile-image")
     public ApiResponse<ProfileImageUrlResponse> registerNewProfileImage(
-            @RequestPart(value = "profile_image")MultipartFile newProfileImage,
+            @RequestPart(value = "profile_image") MultipartFile newProfileImage,
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
         // 생성된 url이 담겨 나간다
         ProfileImageUrlResponse reponse = new ProfileImageUrlResponse(
@@ -61,6 +66,7 @@ public class UserController {
         return ApiResponse.ok(reponse, "profile_image_upload_success");
     }
 
+    @Override
     @DeleteMapping("/me/profile-image")
     public ApiResponse<ProfileImageUrlResponse> removeProfileImage(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
