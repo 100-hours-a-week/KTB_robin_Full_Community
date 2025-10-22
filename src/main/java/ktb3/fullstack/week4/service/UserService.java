@@ -25,15 +25,21 @@ public class UserService {
     private final ProfileImageStore profileImageStore;
 
     public void register(JoinRequest dto) {
-        // 이메일, 닉네임 가용성 체크는 UserController 가 AvailabilityService 에 위임
         String hashedPassword = passwordHasher.hash(dto.getPassword());
-        User user = new User(
-                0L,
-                dto.getEmail(),
-                hashedPassword,
-                dto.getNickname(),
-                dto.getProfileImageUrl()
-        );
+        /*
+        * OCP 관점)
+        *   문제점 : 생성자의 매개변수 순서가 바뀐다면 Service 코드도 수정 되어야함.
+        *   개선 : 빌더 패턴을 사용하여 멤버 이름으로 명시적 초기화
+        *       -> 이제 UserService 는 User 생성자의 매개변수 순서를 몰라도 된다
+        * */
+        User user = User.builder()
+                .id(0L)
+                .email(dto.getEmail())
+                .password(hashedPassword)
+                .nickname(dto.getNickname())
+                .profileImageUrl(dto.getProfileImageUrl())
+                .build();
+
         userRepository.save(user);
     }
 
@@ -43,7 +49,6 @@ public class UserService {
 
         String newNickname = dto.getNewNickname();
         String oldNickname = user.getNickname();
-        // 닉네임 가용성 체크는 UserController 가 AvailabilityService 에 위임
         user.changeNickName(newNickname);
         userRepository.updateNickname(user, oldNickname);
         return new NicknameUpdateResponse(newNickname);

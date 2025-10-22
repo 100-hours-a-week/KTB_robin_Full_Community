@@ -1,12 +1,12 @@
 package ktb3.fullstack.week4.domain.users;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+@Builder
 @Getter
 @Setter
-@AllArgsConstructor
 public class User {
     private long id;
     private String email;
