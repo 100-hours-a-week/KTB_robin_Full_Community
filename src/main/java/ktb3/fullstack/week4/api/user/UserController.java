@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PatchMapping("/me/password") //회원정보 수정 - 비밀번호
-    public ApiResponse<PasswordUpdateRequest> changeNickName(
+    public ApiResponse<PasswordUpdateRequest> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @Valid @RequestBody PasswordUpdateRequest dto) {
         userService.changePassword(userId, dto);
