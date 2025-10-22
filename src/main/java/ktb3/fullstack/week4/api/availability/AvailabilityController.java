@@ -11,15 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/availability")
 @RequiredArgsConstructor
-public class AvailabilityController {
+public class AvailabilityController implements AvailabilityApi {
     private final AvailabilityService availabilityService;
 
+    @Override
     @GetMapping("/email")
     public ApiResponse<Void> checkEmailAvailability(@RequestParam(name = "value") String email) {
         availabilityService.checkEmailAvailability(email);
         return ApiResponse.ok("valid_email");
     }
 
+    @Override
     @GetMapping("/nickname")
     public ApiResponse<Void> checkNicknameAvailability(@RequestParam(name = "value") String nickname) {
         availabilityService.checkNicknameAvailability(nickname);
