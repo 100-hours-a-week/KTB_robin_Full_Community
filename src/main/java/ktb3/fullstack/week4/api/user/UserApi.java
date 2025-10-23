@@ -59,7 +59,7 @@ public interface UserApi {
                     })
             ),
     })
-    ApiResponse<NicknameUpdateResponse> changePassword(
+    ApiResponse<NicknameUpdateResponse> changeNickname(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @Valid @RequestBody NicknameUpdateRequest dto
     );
