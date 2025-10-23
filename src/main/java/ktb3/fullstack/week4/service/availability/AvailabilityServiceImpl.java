@@ -24,12 +24,14 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         checkNicknameAvailability(dto.getNewNickname());
     }
 
+    @Override
     public void checkEmailAvailability(String email) {
         if(userRepository.existsByEmail(email)) {
             throw new ApiException(UserError.EXISTING_EMAIL);
         }
     }
 
+    @Override
     public void checkNicknameAvailability(String nickname) {
         if(userRepository.existsByNickname(nickname)) {
             throw new ApiException(UserError.EXISTING_NICKNAME);

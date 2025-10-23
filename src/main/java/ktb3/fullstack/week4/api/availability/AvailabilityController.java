@@ -2,7 +2,7 @@ package ktb3.fullstack.week4.api.availability;
 
 import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
-import ktb3.fullstack.week4.service.AvailabilityService;
+import ktb3.fullstack.week4.service.availability.AvailabilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
