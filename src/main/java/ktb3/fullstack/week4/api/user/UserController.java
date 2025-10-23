@@ -33,7 +33,7 @@ public class UserController implements UserApi {
     @Override
     @AccessTokenExpireResponse
     @PatchMapping("/me/nickname") //회원정보 수정 - 닉네임
-    public ApiResponse<NicknameUpdateResponse> changePassword(
+    public ApiResponse<NicknameUpdateResponse> changeNickname(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @Valid @RequestBody NicknameUpdateRequest dto) {
         availabilityService.checkNicknameAvailability(dto.getNewNickname());
