@@ -16,7 +16,7 @@ public class ProfileImageStore implements ImageStore {
     }
 
     @Override
-    public void deleteImage(String existingProfileImageUrl) {
-        profileImageMap.remove(existingProfileImageUrl);
+    public byte[] deleteImage(String existingProfileImageUrl) {
+        return profileImageMap.remove(existingProfileImageUrl);
     }
 }
