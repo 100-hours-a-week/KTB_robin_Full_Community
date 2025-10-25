@@ -35,7 +35,7 @@ public class UserService {
         User user = User.builder()
                 .id(0L)
                 .email(dto.getEmail())
-                .password(hashedPassword)
+                .hashedPassword(hashedPassword)
                 .nickname(dto.getNickname())
                 .profileImageUrl(dto.getProfileImageUrl())
                 .build();

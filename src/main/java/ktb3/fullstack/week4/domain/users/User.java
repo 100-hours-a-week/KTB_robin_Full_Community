@@ -10,7 +10,7 @@ import lombok.Setter;
 public class User {
     private long id;
     private String email;
-    private String password;
+    private String hashedPassword;
     private String nickname;
     private String profileImageUrl;
 
@@ -18,7 +18,7 @@ public class User {
         nickname = newNickname;
     }
     public void changePassword(String newPassword) {
-        password = newPassword;
+        hashedPassword = newPassword;
     }
     public void changeProfileImage(String newProfileImageUrl) {
         profileImageUrl = newProfileImageUrl;
