@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class ViewStore implements PostSocialInfoStore {
-    private final Map<Long, AtomicLong> viewsByPostId = new ConcurrentHashMap<>();
+public class PostViewStore implements PostSocialInfoStore {
+    private final Map<Long, AtomicLong> postViewsByPostId = new ConcurrentHashMap<>();
 
     @Override
     public long increment(long postId) {
-        return viewsByPostId.computeIfAbsent(postId, k -> new AtomicLong(0)).incrementAndGet();
+        return postViewsByPostId.computeIfAbsent(postId, k -> new AtomicLong(0)).incrementAndGet();
     }
 
     @Override
     public long getCount(long postId) {
-        return viewsByPostId.getOrDefault(postId, new AtomicLong(0)).get();
+        return postViewsByPostId.getOrDefault(postId, new AtomicLong(0)).get();
     }
 }

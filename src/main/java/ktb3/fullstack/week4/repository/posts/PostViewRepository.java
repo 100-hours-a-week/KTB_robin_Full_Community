@@ -1,20 +1,20 @@
 package ktb3.fullstack.week4.repository.posts;
 
-import ktb3.fullstack.week4.store.posts.ViewStore;
+import ktb3.fullstack.week4.store.posts.PostViewStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ViewRepository implements PostSocialInfoRepository {
-    private final ViewStore viewStore;
+public class PostViewRepository implements PostSocialInfoRepository {
+    private final PostViewStore postViewStore;
 
     @Override
     public long countByPostId(long postId) {
-        return viewStore.getCount(postId);
+        return postViewStore.getCount(postId);
     }
 
     public long plusViewCount(long postId) {
-        return viewStore.increment(postId);
+        return postViewStore.increment(postId);
     }
 }

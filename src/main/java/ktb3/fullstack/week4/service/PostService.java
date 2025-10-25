@@ -13,7 +13,7 @@ import ktb3.fullstack.week4.repository.posts.CommentRepository;
 import ktb3.fullstack.week4.repository.posts.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
 import ktb3.fullstack.week4.repository.UserRepository;
-import ktb3.fullstack.week4.repository.posts.ViewRepository;
+import ktb3.fullstack.week4.repository.posts.PostViewRepository;
 import ktb3.fullstack.week4.store.images.PostImageStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class PostService {
     private final PostImageStore postImageStore;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final ViewRepository viewRepository;
+    private final PostViewRepository postViewRepository;
 
     // 게시글 등록
     public void uploadPost(long userId, PostUploadRequeset dto, MultipartFile image) {
@@ -84,7 +84,7 @@ public class PostService {
         for (Post post : page) {
             long likes = likeRepository.countByPostId(post.getId());
             long comments = commentRepository.countByPostId(post.getId());
-            long views = viewRepository.countByPostId(post.getId());
+            long views = postViewRepository.countByPostId(post.getId());
 
             String author = userRepository.findById(post.getAuthorId())
                     .map(User::getNickname)
@@ -118,7 +118,7 @@ public class PostService {
         Post post = checkCanNotFoundPost(postId);
 
         // 조회수 증가 정책: 상세 조회 시 1 증가
-        viewRepository.plusViewCount(postId);
+        postViewRepository.plusViewCount(postId);
 
         User authorEntity = checkCanNotFoundUser(post.getAuthorId());
         String author = authorEntity.getNickname();
@@ -126,7 +126,7 @@ public class PostService {
         // 숫자 정보
         long likes = likeRepository.countByPostId(postId);
         long commentsCount = commentRepository.countByPostId(postId);
-        long views = viewRepository.countByPostId(postId);
+        long views = postViewRepository.countByPostId(postId);
 
         // (사용자 - 현재 조회중인 게시물) 좋아요 누름 여부
         boolean isLiked = likeRepository.isLiked(postId, userId);
