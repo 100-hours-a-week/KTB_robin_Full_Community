@@ -32,6 +32,66 @@ public interface UserApi {
     })
     ApiResponse<Void> register(@Valid @RequestBody JoinRequest dto);
 
+    @Operation(summary = "회원 정보 조회(간략)", description = "회원의 이메일과 닉네임 정보를 전달합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원 정보 조회(간략) 성공", value = """
+                            {
+                                "message" : "userinfo_request_success",
+                                "data" : {
+                                    "email": "robin123@kakao.com",
+                                    "nickname": "robin.choi"
+                                }
+                            }
+                            """),
+                    })
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "해당 사용자를 찾을 수 없습니다.", value = """
+                            {
+                                "message" : "cannot_found_user",
+                                "data" : null
+                            }
+                            """),
+                    })
+            ),
+    })
+    ApiResponse<UserEditPageResponse> getUserInfoForEditPage(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId);
+
+    @Operation(summary = "회원 탈퇴", description = "현재 사용자를 탈퇴 처리합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원 탈퇴 성공", value = """
+                            {
+                                "message" : "membership_withdraw_success",
+                                "data" : null
+                            }
+                            """),
+                    })
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "해당 사용자를 찾을 수 없습니다.", value = """
+                            {
+                                "message" : "cannot_found_user",
+                                "data" : null
+                            }
+                            """),
+                    })
+            ),
+    })
+    ApiResponse<Void> withdrawMemberShip(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId
+    );
+
     @Operation(summary = "닉네임 변경", description = "현재 사용자의 닉네임을 변경합니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -42,7 +102,7 @@ public interface UserApi {
                                 "message" : "nickname_edit_success",
                                 "data" : {
                                     "newNickname": "robin.choi"
-                                 }
+                                }
                             }
                             """),
                     })
@@ -93,35 +153,6 @@ public interface UserApi {
     ApiResponse<PasswordUpdateRequest> changePassword(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @Valid @RequestBody PasswordUpdateRequest dto
-    );
-
-    @Operation(summary = "회원 탈퇴", description = "현재 사용자를 탈퇴 처리합니다.")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "204",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "회원 탈퇴 성공", value = """
-                            {
-                                "message" : "membership_withdraw_success",
-                                "data" : null
-                            }
-                            """),
-                    })
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "해당 사용자를 찾을 수 없습니다.", value = """
-                            {
-                                "message" : "cannot_found_user",
-                                "data" : null
-                            }
-                            """),
-                    })
-            ),
-    })
-    ApiResponse<Void> withdrawMemberShip(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId
     );
 
     @Operation(summary = "프로필 이미지 업로드", description = "새 프로필 이미지를 업로드하거나 기존 이미지를 교체합니다.")

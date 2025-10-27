@@ -5,10 +5,7 @@ import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.image.ImageProcessor;
 import ktb3.fullstack.week4.common.security.PasswordHasher;
 import ktb3.fullstack.week4.domain.users.User;
-import ktb3.fullstack.week4.dto.users.JoinRequest;
-import ktb3.fullstack.week4.dto.users.NicknameUpdateRequest;
-import ktb3.fullstack.week4.dto.users.NicknameUpdateResponse;
-import ktb3.fullstack.week4.dto.users.PasswordUpdateRequest;
+import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.repository.UserRepository;
 import ktb3.fullstack.week4.store.images.ProfileImageStore;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +38,18 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    // 이메일, 닉네임 조회
+    public UserEditPageResponse getUserInfoForEditPage(long userId) {
+        User user = checkCanNotFoundUser(userId);
+
+        UserEditPageResponse dto = UserEditPageResponse.builder()
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
+
+        return dto;
     }
 
     // 닉네임 변경: 존재 확인 → 저장소 갱신

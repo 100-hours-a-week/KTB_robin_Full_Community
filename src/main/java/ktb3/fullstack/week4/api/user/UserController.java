@@ -7,7 +7,6 @@ import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.availability.AvailabilityService;
-import ktb3.fullstack.week4.service.availability.AvailabilityServiceImpl;
 import ktb3.fullstack.week4.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +41,25 @@ public class UserController implements UserApi {
         return ApiResponse.ok("register_success");
     }
 
+    // 회원정보 수정 페이지 진입 api
+    @Override
+    @AccessTokenExpireResponse
+    @GetMapping("/me") //회원정보 수정 - 닉네임
+    public ApiResponse<UserEditPageResponse> getUserInfoForEditPage(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
+            UserEditPageResponse result = userService.getUserInfoForEditPage(userId);
+        return ApiResponse.ok(result, "nickname_edit_success");
+    }
+
+    @Override
+    @AccessTokenExpireResponse
+    @DeleteMapping("/me")
+    public ApiResponse<Void> withdrawMemberShip(
+            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
+        userService.withdrawMemberShip(userId);
+        return ApiResponse.ok("membership_withdraw_success");
+    }
+
     @Override
     @AccessTokenExpireResponse
     @PatchMapping("/me/nickname") //회원정보 수정 - 닉네임
@@ -61,15 +79,6 @@ public class UserController implements UserApi {
             @Valid @RequestBody PasswordUpdateRequest dto) {
         userService.changePassword(userId, dto);
         return ApiResponse.ok("password_edit_success");
-    }
-
-    @Override
-    @AccessTokenExpireResponse
-    @DeleteMapping("/me")
-    public ApiResponse<Void> withdrawMemberShip(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
-        userService.withdrawMemberShip(userId);
-        return ApiResponse.ok("membership_withdraw_success");
     }
 
     @Override
