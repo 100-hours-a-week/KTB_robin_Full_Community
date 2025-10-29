@@ -1,26 +1,34 @@
 package ktb3.fullstack.week4.domain.users;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Entity
 @Builder
 @Getter
-@Setter
-public class User {
-    private long id;
+@NoArgsConstructor
+@AllArgsConstructor
+public class User extends SoftDeletetionEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
     private String email;
+
     private String hashedPassword;
+
     private String nickname;
-    private String profileImageUrl;
+
+    private LocalDateTime deletedAt;
 
     public void changeNickName(String newNickname) {
         nickname = newNickname;
     }
     public void changePassword(String newPassword) {
         hashedPassword = newPassword;
-    }
-    public void changeProfileImage(String newProfileImageUrl) {
-        profileImageUrl = newProfileImageUrl;
     }
 }
