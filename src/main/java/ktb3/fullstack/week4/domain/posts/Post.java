@@ -36,6 +36,4 @@ public class Post extends SoftDeletetionEntity {
 
     private LocalDateTime deletedAt;
 
-    private boolean isDeleted;
-
 }
