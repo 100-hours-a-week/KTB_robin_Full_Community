@@ -1,9 +1,6 @@
 package ktb3.fullstack.week4.domain.comments;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +19,13 @@ public class Comment extends SoftDeletetionEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(name = "post_id")
     private long postId;
 
+    @Column(name = "author_id")
     private long authorId;
 
+    @Column(name = "content")
     private String content;
 
 }

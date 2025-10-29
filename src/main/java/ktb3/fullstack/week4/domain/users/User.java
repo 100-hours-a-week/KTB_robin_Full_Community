@@ -17,12 +17,16 @@ public class User extends SoftDeletetionEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(name = "email")
     private String email;
 
+    @Column(name = "hashed_password")
     private String hashedPassword;
 
+    @Column(name = "nickname")
     private String nickname;
 
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     public void changeNickName(String newNickname) {
