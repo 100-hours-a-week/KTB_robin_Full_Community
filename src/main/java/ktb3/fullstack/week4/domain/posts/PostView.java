@@ -12,4 +12,9 @@ public class PostView extends BaseTimeEntity {
 
     @Column(name = "view_count")
     private long viewCount;
+
+    @OneToOne
+    @JoinColumn(name = "id")
+    @MapsId
+    private Post post;
 }

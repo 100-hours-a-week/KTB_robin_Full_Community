@@ -11,6 +11,6 @@ public class ProfileImage extends Image {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "id")
     private User user;
 }
