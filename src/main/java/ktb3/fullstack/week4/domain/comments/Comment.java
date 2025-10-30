@@ -2,6 +2,7 @@ package ktb3.fullstack.week4.domain.comments;
 
 import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
+import ktb3.fullstack.week4.domain.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,4 +29,7 @@ public class Comment extends SoftDeletetionEntity {
     @Column(name = "content")
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

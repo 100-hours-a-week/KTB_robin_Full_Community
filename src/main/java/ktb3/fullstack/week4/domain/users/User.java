@@ -2,9 +2,12 @@ package ktb3.fullstack.week4.domain.users;
 
 import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
+import ktb3.fullstack.week4.domain.images.ProfileImage;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -28,6 +31,9 @@ public class User extends SoftDeletetionEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "user")
+    List<ProfileImage> profileImages = new ArrayList<>();
 
     public void changeNickName(String newNickname) {
         nickname = newNickname;
