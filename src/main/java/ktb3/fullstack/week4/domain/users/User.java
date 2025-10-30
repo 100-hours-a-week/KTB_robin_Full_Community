@@ -33,7 +33,7 @@ public class User extends SoftDeletetionEntity {
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "user")
-    List<ProfileImage> profileImages = new ArrayList<>();
+    private List<ProfileImage> profileImages = new ArrayList<>();
 
     public void changeNickName(String newNickname) {
         nickname = newNickname;
