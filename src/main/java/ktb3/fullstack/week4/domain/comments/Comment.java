@@ -31,4 +31,8 @@ public class Comment extends SoftDeletetionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public void linkPost(Post post) {
+        this.post = post;
+    }
 }

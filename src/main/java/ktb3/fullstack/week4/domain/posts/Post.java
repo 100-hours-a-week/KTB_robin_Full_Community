@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.images.PostImage;
+import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.users.User;
 import lombok.AllArgsConstructor;
@@ -54,4 +55,19 @@ public class Post extends SoftDeletetionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void addComment(Comment comment) { // 연관관계 편의 메소드
+        comments.add(comment);
+        comment.linkPost(this);
+    }
+
+    public void addLikes(Like like) { // 연관관계 편의 메소드
+        likes.add(like);
+        like.linkPost(this);
+    }
+
+    public void addPostImages(PostImage postImage) { // 연관관계 편의 메소드
+        postImages.add(postImage);
+        postImage.linkPost(this);
+    }
 }
