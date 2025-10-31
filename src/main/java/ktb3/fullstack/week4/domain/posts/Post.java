@@ -48,10 +48,10 @@ public class Post extends SoftDeletetionEntity {
     @OneToMany(mappedBy = "post")
     private List<PostImage> postImages = new ArrayList<>();
 
-    @OneToOne(mappedBy = "post")
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     private PostView postView;
 
-    @ManyToOne
-    @JoinColumn(name = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 }
