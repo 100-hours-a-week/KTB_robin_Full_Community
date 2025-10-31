@@ -21,9 +21,6 @@ public class Comment extends SoftDeletetionEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "author_id")
-    private long authorId;
-
     @Column(name = "content")
     private String content;
 
