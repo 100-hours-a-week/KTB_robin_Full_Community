@@ -21,9 +21,6 @@ public class Comment extends SoftDeletetionEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "post_id")
-    private long postId;
-
     @Column(name = "author_id")
     private long authorId;
 
@@ -31,10 +28,10 @@ public class Comment extends SoftDeletetionEntity {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "post_id")
     private Post post;
 }
