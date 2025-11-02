@@ -13,7 +13,7 @@ import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.auth.LoginResponse;
 import ktb3.fullstack.week4.dto.auth.LoginRequest;
 import ktb3.fullstack.week4.dto.auth.RefreshResponse;
-import ktb3.fullstack.week4.repository.UserRepository;
+import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.store.RefreshTokenStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

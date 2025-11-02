@@ -1,10 +1,10 @@
-package ktb3.fullstack.week4.service.availability;
+package ktb3.fullstack.week4.service.availabilities;
 
 import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.dto.users.JoinRequest;
 import ktb3.fullstack.week4.dto.users.NicknameUpdateRequest;
-import ktb3.fullstack.week4.repository.UserRepository;
+import ktb3.fullstack.week4.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

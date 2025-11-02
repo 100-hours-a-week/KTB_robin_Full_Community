@@ -3,78 +3,98 @@ package ktb3.fullstack.week4.service;
 import ktb3.fullstack.week4.common.error.codes.*;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.image.ImageProcessor;
+import ktb3.fullstack.week4.domain.images.PostImage;
+import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.posts.Post;
-import ktb3.fullstack.week4.domain.posts.Comment;
+import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
-import ktb3.fullstack.week4.repository.posts.CommentRepository;
-import ktb3.fullstack.week4.repository.posts.LikeRepository;
+import ktb3.fullstack.week4.repository.comments.CommentRepository;
+import ktb3.fullstack.week4.repository.likes.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
-import ktb3.fullstack.week4.repository.UserRepository;
+import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.repository.posts.PostViewRepository;
-import ktb3.fullstack.week4.store.images.PostImageStore;
+import ktb3.fullstack.week4.service.error.ErrorCheckServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
+    private final CommentService commentService;
+    private final LikeService likeService;
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final ImageProcessor imageProcessor;
-    private final PostImageStore postImageStore;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final PostViewRepository postViewRepository;
+    private final ErrorCheckServiceImpl errorCheckService;
+
+    @Value("${file.postDir}")
+    private String folderPath;
 
     // 게시글 등록
+    @Transactional
     public void uploadPost(long userId, PostUploadRequeset dto, MultipartFile image) {
-        checkCanNotFoundUser(userId);
 
-        String postImageUrl = null;
-        if(image != null) {
-            byte[] imageBytes = imageProcessor.toByteStream(image);
-            postImageUrl = imageProcessor.makeRandomImageUrl();
-            postImageStore.uploadImage(postImageUrl, imageBytes);
+        User user = errorCheckService.checkCanNotFoundUser(userId, userRepository);
+
+        String postImageUrl = folderPath + image.getOriginalFilename();
+
+        // (리팩토링 필요) 에러 등록 및 관리
+        try {
+            image.transferTo(new File(postImageUrl));
+        } catch (IOException e) {
+            System.out.println("이미지 이동 중 문제 발생!");
+            log.info("이미지 이동 중 문제 발생!");
         }
 
-        long authorId = userId;
-        String title = dto.getTitle();
-        String content = dto.getContent();
+        Post post = Post.builder()
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .postView(null)
+                .user(user)
+                .build();
 
-        Post post = new Post(
-                0L,
-                authorId,
-                title,
-                content,
-                postImageUrl,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
         // 이미 존재하는 유저라면
-        if(post.getId() != 0) {
+        if(post.getId() != null) {
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
+
+        PostImage postImage = PostImage.builder()
+                .post(post)
+                .imageUrl(postImageUrl)
+                .build();
+
+        post.addPostImages(postImage);
 
         postRepository.save(post);
     }
 
     // 게시글 목록조회
+    @Transactional(readOnly = true)
     public PostListResponse getPostList(long userId, int after, int limit) {
-        checkCanNotFoundUser(userId);
+        errorCheckService.checkCanNotFoundUser(userId, userRepository);
 
         int from = after + 1;
         int to = after + limit;
 
-        List<Post> raw = postRepository.findPosts(from, to);
+        List<Post> raw = postRepository.findAllByIdBetween((long)from, (long)to);
 
         boolean hasNext = raw.size() > limit;
         List<Post> page = hasNext ? raw.subList(0, limit) : raw;
@@ -86,7 +106,7 @@ public class PostService {
             long comments = commentRepository.countByPostId(post.getId());
             long views = postViewRepository.countByPostId(post.getId());
 
-            String author = userRepository.findById(post.getAuthorId())
+            String author = userRepository.findById(post.getUser().getId())
                     .map(User::getNickname)
                     .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
 
@@ -110,7 +130,7 @@ public class PostService {
 
     // 게시글 상세조회
     public PostDetailResponse getSinglePostDeatil(long userId, long postId) {
-        checkCanNotFoundUser(userId);
+        errorCheckService.checkCanNotFoundUser(userId, userRepository);
 
         if (postId <= 0) {
             throw new ApiException(GenericError.INVALID_REQUEST);
@@ -164,7 +184,7 @@ public class PostService {
 
     // 게시글 수정
     public void editPost(long userId, long postId, PostUploadRequeset dto, MultipartFile image) {
-        checkCanNotFoundUser(userId);
+        errorCheckService.checkCanNotFoundUser(userId, userRepository);
 
         Post post = checkCanNotFoundPost(postId);
 
@@ -198,7 +218,7 @@ public class PostService {
 
     // 게시글 삭제
     public void removePost(long userId, long postId) {
-        checkCanNotFoundUser(userId);
+        errorCheckService.checkCanNotFoundUser(userId, userRepository);
 
         Post post = checkCanNotFoundPost(postId);
 
@@ -218,114 +238,6 @@ public class PostService {
         boolean isPostDeleted = postRepository.deleteById(postId);
         if (!isPostDeleted) {
             throw new ApiException(PostError.CANNOT_FOUND_POST);
-        }
-    }
-
-
-    // 게시글 좋아요
-    public void likePost(long userId, long postId) {
-        checkCanNotFoundUser(userId);
-        Post post = checkCanNotFoundPost(postId);
-        likeRepository.like(post.getId(), userId);
-    }
-
-    // 게시글 좋아요 취소
-    public void unlikePost(long userId, long postId) {
-        checkCanNotFoundUser(userId);
-        Post post = checkCanNotFoundPost(postId);
-        likeRepository.unlike(post.getId(), userId);
-    }
-
-    // 댓글 등록
-    public void addComment(long userId, long postId, String content) {
-        checkCanNotFoundUser(userId);
-        Post post = checkCanNotFoundPost(postId);
-        if (content == null || content.isBlank()) {
-            throw new ApiException(GenericError.INVALID_REQUEST);
-        }
-        commentRepository.addComment(post.getId(), userId, content);
-    }
-
-    // 댓글 수정
-    public void editComment(long userId, long postId, long commentId, String content) {
-        checkCanNotFoundUser(userId);
-        checkCanNotFoundPost(postId);
-        if (content == null || content.isBlank()) {
-            throw new ApiException(GenericError.INVALID_REQUEST);
-        }
-
-        // 존재/소유 확인을 위해 먼저 조회
-        List<Comment> comments = commentRepository.findByPostId(postId);
-        Comment target = null;
-        for (Comment c : comments) {
-            if (c.getId() == commentId) {
-                target = c;
-                break;
-            }
-        }
-        if (target == null) {
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
-        if (target.getAuthorId() != userId) {
-            throw new ApiException(CommentError.CANNOT_EDIT_OTHERS_COMMENT);
-        }
-
-        boolean ok = commentRepository.editComment(postId, commentId, userId, content);
-        if (!ok) {
-            // 이 경우는 동시성 등으로 수정 실패한 예외 케이스
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
-    }
-
-    // 댓글 삭제
-    public void removeComment(long userId, long postId, long commentId) {
-        checkCanNotFoundUser(userId);
-        checkCanNotFoundPost(postId);
-
-        // 존재/소유 확인을 위해 먼저 조회
-        List<Comment> comments = commentRepository.findByPostId(postId);
-        Comment target = null;
-        for (Comment comment : comments) {
-            if (comment.getId() == commentId) {
-                target = comment;
-                break;
-            }
-        }
-
-        if (target == null) {
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
-        if (target.getAuthorId() != userId) {
-            throw new ApiException(CommentError.CANNOT_DELETE_OTHERS_COMMENT);
-        }
-
-        boolean ok = commentRepository.deleteComment(postId, commentId, userId);
-        if (!ok) {
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
-    }
-
-    private User checkCanNotFoundUser(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
-        return user;
-    }
-
-    private Post checkCanNotFoundPost(long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(PostError.CANNOT_FOUND_POST));
-        return post;
-    }
-
-    private void checkCanNotEditOthersPost(long userId, long authorId) {
-        if(userId != authorId) {
-            throw new ApiException(PostError.CANNOT_EDIT_OTHERS_POST);
-        }
-    }
-
-    private void checkCanNotDeleteOthersPost(long userId, long authorId) {
-        if(userId != authorId) {
-            throw new ApiException(PostError.CANNOT_DELETE_OTHERS_POST);
         }
     }
 }
