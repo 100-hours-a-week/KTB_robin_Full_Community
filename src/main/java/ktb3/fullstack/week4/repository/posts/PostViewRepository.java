@@ -1,20 +1,18 @@
 package ktb3.fullstack.week4.repository.posts;
 
-import ktb3.fullstack.week4.store.posts.PostViewStore;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import ktb3.fullstack.week4.domain.posts.PostView;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Component
-@RequiredArgsConstructor
-public class PostViewRepository implements PostSocialInfoRepository {
-    private final PostViewStore postViewStore;
+import java.util.Optional;
 
-    @Override
-    public long countByPostId(long postId) {
-        return postViewStore.getCount(postId);
-    }
+@Repository
+public interface PostViewRepository extends JpaRepository<PostView, Long> {
 
-    public long plusViewCount(long postId) {
-        return postViewStore.increment(postId);
-    }
+    PostView save(PostView postView);
+
+    Optional<PostView> findById(Long id);
+
+    long countByPostId(Long postId);
+
 }
