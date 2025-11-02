@@ -1,7 +1,10 @@
 package ktb3.fullstack.week4.repository.images;
 
+import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +21,13 @@ public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long
     void deleteById(Long id);
 
     List<ProfileImage> findAllByUserId(Long userId);
+
+    Optional<ProfileImage> findByIsPrimaryIsTrue();
+
+    @Query("select pi " +
+            "from ProfileImage pi " +
+            "where pi.user.id = :userId and pi.isPrimary = false " +
+            "order by pi.displayOrder asc"
+    )
+    List<ProfileImage> findAllOfNotPrimaryProfileImages(@Param("userId") Long userId);
 }
