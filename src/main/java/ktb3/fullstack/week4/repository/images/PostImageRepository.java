@@ -15,17 +15,17 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
     PostImage save(PostImage postImage);
 
-    Optional<PostImage> findById(Long id);
+    Optional<PostImage> findByIdAndDeletedIsFalse(Long id);
 
     void deleteById(Long id);
 
-    List<PostImage> findAllByPostId(Long postId);
+    List<PostImage> findAllByPostIdAndDeletedIsFalse(Long postId);
 
     Optional<PostImage> findByIsPrimaryIsTrue();
 
     @Query("select pi " +
             "from PostImage pi " +
-            "where pi.post.id = :postId and pi.isPrimary = false " +
+            "where pi.post.id = :postId and pi.isPrimary = false and pi.deleted = false " +
             "order by pi.displayOrder asc"
     )
     List<PostImage> findAllOfNotPrimaryPostImages(@Param("postId") Long postId);
