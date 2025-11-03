@@ -5,9 +5,13 @@ import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.users.User;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
+@SuperBuilder
 @Getter
+@NoArgsConstructor
 public class Like extends SoftDeletetionEntity {
 
     @Id
@@ -28,5 +32,9 @@ public class Like extends SoftDeletetionEntity {
 
     public void linkPost(Post post) {
         this.post = post;
+    }
+
+    public void flipIsLiked() {
+        this.isLiked = !this.isLiked;
     }
 }

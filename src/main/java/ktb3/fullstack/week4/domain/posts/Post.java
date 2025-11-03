@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.images.PostImage;
-import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.users.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
@@ -19,10 +18,10 @@ import java.util.List;
 
 
 @Entity
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Post extends SoftDeletetionEntity {
 
     @Id
@@ -40,6 +39,7 @@ public class Post extends SoftDeletetionEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
@@ -55,6 +55,7 @@ public class Post extends SoftDeletetionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
 
     public void addComment(Comment comment) { // 연관관계 편의 메소드
         comments.add(comment);

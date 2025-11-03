@@ -4,29 +4,29 @@ import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Builder
+@SuperBuilder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class User extends SoftDeletetionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "hashed_password")
     private String hashedPassword;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
     @Column(name = "deleted_at")

@@ -4,17 +4,17 @@ import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.users.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 
 @Entity
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Comment extends SoftDeletetionEntity {
 
     @Id

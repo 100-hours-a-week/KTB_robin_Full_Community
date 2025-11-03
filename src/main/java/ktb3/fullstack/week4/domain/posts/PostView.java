@@ -3,9 +3,13 @@ package ktb3.fullstack.week4.domain.posts;
 import jakarta.persistence.*;
 import ktb3.fullstack.week4.domain.BaseTimeEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
+@SuperBuilder
 @Getter
+@NoArgsConstructor
 public class PostView extends BaseTimeEntity {
 
     @Id
