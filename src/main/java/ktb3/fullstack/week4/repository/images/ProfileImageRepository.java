@@ -15,18 +15,18 @@ public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long
 
     ProfileImage save(ProfileImage profileImage);
 
-    Optional<ProfileImage> findByIdAndDeletedIsFalse(Long id);
+    Optional<ProfileImage> findById(Long id);
 
     void deleteById(Long id);
 
-    List<ProfileImage> findAllByUserIdAndDeletedIsFalse(Long userId);
+    List<ProfileImage> findAllByUserId(Long userId);
 
-    ProfileImage findByIsPrimaryIsTrue();
+    ProfileImage findByUserIdAndIsPrimaryIsTrue(Long userId);
 
     @Query("select pi " +
             "from ProfileImage pi " +
             "where pi.user.id = :userId and pi.isPrimary = false and pi.deleted = false " +
             "order by pi.displayOrder asc"
     )
-    List<ProfileImage> findAllOfNotPrimaryProfileImages(@Param("userId") Long userId);
+    List<ProfileImage> findAllNotPrimary(@Param("userId") Long userId);
 }

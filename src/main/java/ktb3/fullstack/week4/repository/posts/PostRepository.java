@@ -2,7 +2,6 @@ package ktb3.fullstack.week4.repository.posts;
 
 
 import ktb3.fullstack.week4.domain.posts.Post;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +17,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     void deleteById(Long id);
 
-    List<Post> findAllByIdBetween(Long idAfter, Long idBefore, Limit limit);
+    List<Post> findAllByIdBetween(Long idAfter, Long idBefore);
 }
