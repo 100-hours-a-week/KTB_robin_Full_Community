@@ -19,7 +19,9 @@ public class ProfileImage extends Image {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void linkUser(User user) {
+
+    public void linkUser(User user) { // 연관관계 편의 메소드
         this.user = user;
+        user.getProfileImages().add(this);
     }
 }

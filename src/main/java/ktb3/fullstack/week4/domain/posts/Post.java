@@ -56,19 +56,4 @@ public class Post extends SoftDeletetionEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-
-    public void addComment(Comment comment) { // 연관관계 편의 메소드
-        comments.add(comment);
-        comment.linkPost(this);
-    }
-
-    public void addLikes(Like like) { // 연관관계 편의 메소드
-        likes.add(like);
-        like.linkPost(this);
-    }
-
-    public void addPostImages(PostImage postImage) { // 연관관계 편의 메소드
-        postImages.add(postImage);
-        postImage.linkPost(this);
-    }
 }

@@ -32,7 +32,8 @@ public class Comment extends SoftDeletetionEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public void linkPost(Post post) {
+    public void linkPost(Post post) { // 연관관계 편의 메소드
         this.post = post;
+        post.getComments().add(this);
     }
 }

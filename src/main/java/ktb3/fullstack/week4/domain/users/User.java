@@ -35,10 +35,6 @@ public class User extends SoftDeletetionEntity {
     @OneToMany(mappedBy = "user")
     private List<ProfileImage> profileImages = new ArrayList<>();
 
-    public void addProfileImage(ProfileImage profileImage) { // 연관관계 편의 메소드
-        profileImages.add(profileImage);
-        profileImage.linkUser(this);
-    }
 
     public void changeNickName(String newNickname) {
         nickname = newNickname;
