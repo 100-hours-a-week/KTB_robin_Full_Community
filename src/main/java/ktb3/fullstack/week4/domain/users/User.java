@@ -42,4 +42,9 @@ public class User extends SoftDeletetionEntity {
     public void changePassword(String newPassword) {
         hashedPassword = newPassword;
     }
+
+    public void deleteUser() {
+        this.deleteEntity();
+        this.deletedAt = LocalDateTime.now();
+    }
 }

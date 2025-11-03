@@ -14,5 +14,9 @@ import lombok.experimental.SuperBuilder;
 public abstract class SoftDeletetionEntity extends BaseTimeEntity {
 
     @Column(name = "deleted")
-    private boolean deleted;
+    protected boolean deleted;
+
+    protected void deleteEntity() {
+        this.deleted = true;
+    }
 }
