@@ -22,4 +22,13 @@ public abstract class Image extends SoftDeletetionEntity {
 
     @Column(name = "display_order")
     protected int displayOrder;
+
+
+    public void adjustDisplayOrder() {
+        this.displayOrder += 1;
+    }
+
+    public void makeToNonPrimary() {
+        this.isPrimary = false;
+    }
 }
