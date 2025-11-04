@@ -18,7 +18,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     Like findByPostIdAndUserId(Long postId, Long userId);
 
-    // 한 번이라도 좋아요를 누른저기 있는지 확인
+    // 한 번이라도 좋아요를 누른적이 있는지 확인
     boolean existsByPostIdAndUserId(Long postId, Long userId);
 
     // 해당 게시글의 사용자 좋아요 여부 확인
