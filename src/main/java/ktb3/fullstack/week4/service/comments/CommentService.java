@@ -10,6 +10,7 @@ import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class CommentService {
 
 
     // 댓글 등록
+    @Transactional
     public void addComment(long userId, long postId, String content) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
         Post post = errorCheckService.checkCanNotFoundPost(postId);
@@ -34,6 +36,7 @@ public class CommentService {
     }
 
     // 댓글 수정
+    @Transactional
     public void editComment(long userId, long postId, long commentId, String content) {
         errorCheckService.checkCanNotFoundUser(userId);
         errorCheckService.checkCanNotFoundPost(postId);
@@ -63,6 +66,7 @@ public class CommentService {
     }
 
     // 댓글 삭제
+    @Transactional
     public void removeComment(long userId, long postId, long commentId) {
         errorCheckService.checkCanNotFoundUser(userId);
         errorCheckService.checkCanNotFoundPost(postId);
