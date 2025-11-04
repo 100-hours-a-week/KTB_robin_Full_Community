@@ -56,4 +56,8 @@ public class Post extends SoftDeletetionEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public void editPost(PostEditRequest dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+    }
 }
