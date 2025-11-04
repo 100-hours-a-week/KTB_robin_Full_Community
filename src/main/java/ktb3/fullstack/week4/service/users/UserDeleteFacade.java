@@ -32,11 +32,7 @@ public class UserDeleteFacade {
 
     private final ErrorCheckServiceImpl errorCheckService;
 
-     /*
-     질문 1. 만약 아래 트랜잭션 어노테이션이 없다면, UserService.withdrawMemberShip 메소드에서 퍼사드의 deleteUser 메소드를 호출했을때,
-     deleteUser 메소드는 withdrawMemberShip 메소드의 트랜잭션 안에서 실행되는게 아니야?
-     */
-     // 반드시 상위 트랜잭션 안에서만 실행되도록 강제(호출 측에서 @Transactional)
+    // 반드시 상위 트랜잭션 안에서만 실행되도록 강제(호출 측에서 @Transactional)
     @Transactional(propagation = Propagation.MANDATORY)
     public void deleteUser(long userId) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
@@ -44,18 +40,11 @@ public class UserDeleteFacade {
         // 프로필 이미지 삭제 처리
         List<ProfileImage> profileImages = user.getProfileImages();
         for (ProfileImage profileImage : profileImages) {
-             /*
-             질문 2. 이렇게 하면 deleted = true 로 바뀐 엔티티들의 modifiedAt 속성만 현재로 변경되니?
-             위 질문은 Auditing 이런 상황에서 동작하는지에 대한 질문임.
-             */
             if(!profileImage.isDeleted()) {
                 profileImage.deleteEntity();
             }
         }
 
-        /*
-        질문 3: 아래의 코드들도 모두 정상적으로 더티체킹이 동작하여서 DB 에도 반영되니?
-        */
         // 게시글
         List<Post> postListOfUser = postRepository.findAllByUserId(userId);
         for (Post post : postListOfUser) {
