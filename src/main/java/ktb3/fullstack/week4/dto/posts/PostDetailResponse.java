@@ -33,8 +33,11 @@ public class PostDetailResponse {
         @JsonProperty("modified_at")
         private LocalDateTime modifiedAt;
 
-        @JsonProperty("image_url")
-        private String imageUrl;
+        @JsonProperty("primary_image_url")
+        private String primaryImageUrl;
+
+        @JsonProperty("rest_image_urls")
+        private List<String> restImageUrls;
 
         @JsonProperty("content")
         private String content;
