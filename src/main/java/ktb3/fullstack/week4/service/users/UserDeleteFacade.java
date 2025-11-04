@@ -11,6 +11,7 @@ import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.repository.likes.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
+import ktb3.fullstack.week4.service.posts.PostDeleteFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +33,8 @@ public class UserDeleteFacade {
 
     private final ErrorCheckServiceImpl errorCheckService;
 
+    private final PostDeleteFacade postDeleteFacade;
+
     // 반드시 상위 트랜잭션 안에서만 실행되도록 강제(호출 측에서 @Transactional)
     @Transactional(propagation = Propagation.MANDATORY)
     public void deleteUser(long userId) {
@@ -49,27 +52,7 @@ public class UserDeleteFacade {
         List<Post> postListOfUser = postRepository.findAllByUserId(userId);
         for (Post post : postListOfUser) {
             // 게시글 이미지 삭제 처리
-            for (PostImage postImage : post.getPostImages()) {
-                if (!postImage.isDeleted()) {
-                    postImage.deleteEntity();
-                }
-            }
-            // 게시글에 달린 댓글 삭제 처리
-            for (Comment comment : post.getComments()) {
-                if (!comment.isDeleted()) {
-                    comment.deleteEntity();
-                }
-            }
-            // 게시글에 달린 좋아요 삭제 처리
-            for (Like like : post.getLikes()) {
-                if(!like.isDeleted()) {
-                    like.deleteEntity();
-                }
-            }
-            // 게시글 삭제 처리
-            if (!post.isDeleted()) {
-                post.deleteEntity();
-            }
+            postDeleteFacade.deletePost(post.getId());
         }
         // 사용자가 작성한 모든 댓글
         List<Comment> comments = commentRepository.findAllByUserId(userId);
