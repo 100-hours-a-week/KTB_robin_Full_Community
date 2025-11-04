@@ -1,22 +1,25 @@
-package ktb3.fullstack.week4.service;
+package ktb3.fullstack.week4.service.posts;
 
 import ktb3.fullstack.week4.common.error.codes.*;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
-import ktb3.fullstack.week4.common.image.ImageProcessor;
+import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.PostImage;
-import ktb3.fullstack.week4.domain.images.ProfileImage;
+import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.comments.Comment;
+import ktb3.fullstack.week4.domain.posts.PostView;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
+import ktb3.fullstack.week4.dto.posts.PostEditRequest;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import ktb3.fullstack.week4.repository.comments.CommentRepository;
+import ktb3.fullstack.week4.repository.images.PostImageRepository;
 import ktb3.fullstack.week4.repository.likes.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
 import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.repository.posts.PostViewRepository;
-import ktb3.fullstack.week4.service.error.ErrorCheckServiceImpl;
+import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,21 +32,25 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
-    private final CommentService commentService;
-    private final LikeService likeService;
+    private final PostDomainBuilder postDomainBuilder;
+
+    private final ErrorCheckServiceImpl errorCheckService;
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final PostViewRepository postViewRepository;
-    private final ErrorCheckServiceImpl errorCheckService;
+    private final PostImageRepository postImageRepository;
+
+    private final PostDeleteFacade postDeleteFacade;
 
     @Value("${file.postDir}")
     private String folderPath;
@@ -52,7 +59,7 @@ public class PostService {
     @Transactional
     public void uploadPost(long userId, PostUploadRequeset dto, MultipartFile image) {
 
-        User user = errorCheckService.checkCanNotFoundUser(userId, userRepository);
+        User user = errorCheckService.checkCanNotFoundUser(userId);
 
         String postImageUrl = folderPath + image.getOriginalFilename();
 
@@ -64,47 +71,35 @@ public class PostService {
             log.info("이미지 이동 중 문제 발생!");
         }
 
-        Post post = Post.builder()
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .postView(null)
-                .user(user)
-                .build();
-
-        // 이미 존재하는 유저라면
-        if(post.getId() != null) {
-            throw new ApiException(GenericError.INVALID_REQUEST);
-        }
-
-        PostImage postImage = PostImage.builder()
-                .post(post)
-                .imageUrl(postImageUrl)
-                .build();
-
-        post.addPostImages(postImage);
-
+        Post post = postDomainBuilder.buildPost(dto, user);
+        PostImage postImage = postDomainBuilder.buildPostImage(post, postImageUrl);
         postRepository.save(post);
+        postImageRepository.save(postImage);
     }
 
     // 게시글 목록조회
     @Transactional(readOnly = true)
     public PostListResponse getPostList(long userId, int after, int limit) {
-        errorCheckService.checkCanNotFoundUser(userId, userRepository);
+        errorCheckService.checkCanNotFoundUser(userId);
 
         int from = after + 1;
         int to = after + limit;
 
-        List<Post> raw = postRepository.findAllByIdBetween((long)from, (long)to);
+        List<Post> raw = postRepository.findAllByIdBetween((long) from, (long) to);
 
         boolean hasNext = raw.size() > limit;
         List<Post> page = hasNext ? raw.subList(0, limit) : raw;
 
         List<PostListResponse.PostBriefInfo> briefs = new ArrayList<>(page.size());
 
+
         for (Post post : page) {
-            long likes = likeRepository.countByPostId(post.getId());
-            long comments = commentRepository.countByPostId(post.getId());
-            long views = postViewRepository.countByPostId(post.getId());
+
+            long postId = post.getId();
+
+            long likes = likeRepository.countByPostId(postId);
+            long comments = commentRepository.countByPostId(postId);
+            long views = postViewRepository.countByPostId(postId);
 
             String author = userRepository.findById(post.getUser().getId())
                     .map(User::getNickname)
@@ -121,26 +116,27 @@ public class PostService {
             ));
         }
 
-        int nextCursor = page.isEmpty() ?
-                after :
-                Math.toIntExact(page.get(page.size() - 1).getId());
+        int nextCursor = page.isEmpty() ? after : Math.toIntExact(page.getLast().getId());
 
         return new PostListResponse(briefs, nextCursor, hasNext);
     }
 
     // 게시글 상세조회
+    @Transactional
     public PostDetailResponse getSinglePostDeatil(long userId, long postId) {
-        errorCheckService.checkCanNotFoundUser(userId, userRepository);
+        errorCheckService.checkCanNotFoundUser(userId);
 
         if (postId <= 0) {
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
-        Post post = checkCanNotFoundPost(postId);
 
-        // 조회수 증가 정책: 상세 조회 시 1 증가
-        postViewRepository.plusViewCount(postId);
+        Post post = errorCheckService.checkCanNotFoundPost(postId);
 
-        User authorEntity = checkCanNotFoundUser(post.getAuthorId());
+        // 조회 수 증가
+        PostView postView = post.getPostView();
+        postView.plusViewCount();
+
+        User authorEntity = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
         String author = authorEntity.getNickname();
 
         // 숫자 정보
@@ -149,22 +145,35 @@ public class PostService {
         long views = postViewRepository.countByPostId(postId);
 
         // (사용자 - 현재 조회중인 게시물) 좋아요 누름 여부
-        boolean isLiked = likeRepository.isLiked(postId, userId);
+        boolean isLiked = likeRepository.existsByPostIdAndUserIdAndIsLikedTrue(postId, userId);
 
         // 댓글 상세 목록 조회 + dto 매핑
-        List<Comment> commentEntities = commentRepository.findByPostId(postId);
+        List<Comment> commentEntities = commentRepository.findAllByPostId(postId);
         List<PostDetailResponse.CommentInfo> comments = new ArrayList<>();
         for (Comment comment : commentEntities) {
-            User commentAuthorEntity = checkCanNotFoundUser(comment.getAuthorId());
-            String commentAuthor = commentAuthorEntity.getNickname();
 
             comments.add(new PostDetailResponse.CommentInfo(
                             comment.getId(),
-                            commentAuthor,
+                            author,
                             comment.getContent(),
                             comment.getModifiedAt()
                     )
             );
+        }
+
+        String primaryImageUrl = "";
+        try {
+            PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).get();
+            primaryImageUrl = primaryImage.getImageUrl();
+        } catch (NoSuchElementException e) {
+            System.out.println("사진이 없음");
+            log.info("사진이 없음");
+        }
+
+        List<PostImage> restImages = postImageRepository.findAllNotPrimaryPostImages(postId);
+        List<String> restImageUrls = new ArrayList<>();
+        for (PostImage postImage : restImages) {
+            restImageUrls.add(postImage.getImageUrl());
         }
 
         PostDetailResponse.PostInfo postInfo = new PostDetailResponse.PostInfo(
@@ -175,7 +184,8 @@ public class PostService {
                 views,
                 author,
                 post.getModifiedAt(),
-                post.getImageUrl(),
+                primaryImageUrl,
+                restImageUrls,
                 post.getContent()
         );
 
@@ -183,61 +193,50 @@ public class PostService {
     }
 
     // 게시글 수정
-    public void editPost(long userId, long postId, PostUploadRequeset dto, MultipartFile image) {
-        errorCheckService.checkCanNotFoundUser(userId, userRepository);
+    @Transactional
+    public void editPost(long userId, long postId, PostEditRequest dto, MultipartFile image) {
+        errorCheckService.checkCanNotFoundUser(userId);
 
-        Post post = checkCanNotFoundPost(postId);
+        Post post = errorCheckService.checkCanNotFoundPost(postId);
 
         // 작성자 본인 여부 확인
-        checkCanNotEditOthersPost(userId, post.getAuthorId());
+        errorCheckService.checkCanNotEditOthersPost(userId, post.getUser().getId());
 
         // 제목/본문 수정
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
+        post.editPost(dto);
 
-        // 이미지 수정: 새 이미지가 있을 때만 교체
+        // 이미지 수정: primary 이미지 교체
         if (image != null && !image.isEmpty()) {
-            // 기존 이미지 삭제
-            String existingUrl = post.getImageUrl();
-            if (existingUrl != null) {
-                postImageStore.deleteImage(existingUrl);
+            // 기존 대표 이미지 삭제
+            postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId)
+                    .ifPresent(SoftDeletetionEntity::deleteEntity);
+
+            // 2) 로컬 폴더에 새 이미지 파일 저장
+            String postImageUrl = folderPath + image.getOriginalFilename();
+
+            try {
+                image.transferTo(new File(postImageUrl));
+            } catch (IOException e) {
+                System.out.println("이미지 이동 중 문제 발생!");
+                log.info("이미지 이동 중 문제 발생!");
             }
+
             // 새 이미지 업로드
-            byte[] imageBytes = imageProcessor.toByteStream(image);
-            String newUrl = imageProcessor.makeRandomImageUrl();
-            postImageStore.uploadImage(newUrl, imageBytes);
-            post.setImageUrl(newUrl);
+            PostImage newPrimaryImage = postDomainBuilder.buildPostImage(post, postImageUrl);
+            postImageRepository.save(newPrimaryImage);
         }
-
-        // 수정 시각 갱신
-        post.setModifiedAt(LocalDateTime.now());
-
-        // 저장
-        postRepository.update(post);
     }
 
     // 게시글 삭제
+    @Transactional
     public void removePost(long userId, long postId) {
-        errorCheckService.checkCanNotFoundUser(userId, userRepository);
+        errorCheckService.checkCanNotFoundUser(userId);
 
-        Post post = checkCanNotFoundPost(postId);
+        Post post = errorCheckService.checkCanNotFoundPost(postId);
 
         // 본인 소유 확인
-        checkCanNotDeleteOthersPost(userId, post.getAuthorId());
+        errorCheckService.checkCanNotDeleteOthersPost(userId, post.getUser().getId());
 
-        // 게시글 이미지가 있다면 함께 정리
-        String imageUrl = post.getImageUrl();
-        if (imageUrl != null) {
-            byte[] previousImageInfo = postImageStore.deleteImage(imageUrl);
-            if(previousImageInfo == null) {
-                throw new ApiException(FileError.IMAGE_NOT_FOUND);
-            }
-        }
-
-        // 인메모리에서 삭제
-        boolean isPostDeleted = postRepository.deleteById(postId);
-        if (!isPostDeleted) {
-            throw new ApiException(PostError.CANNOT_FOUND_POST);
-        }
+        postDeleteFacade.deletePost(postId);
     }
 }
