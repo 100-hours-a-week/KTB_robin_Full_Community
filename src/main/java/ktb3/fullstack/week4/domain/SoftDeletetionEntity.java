@@ -16,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 public abstract class SoftDeletetionEntity extends BaseTimeEntity {
 
     @Column(name = "deleted")
-    protected boolean deleted;
+    protected boolean deleted = false;
 
     public void deleteEntity() {
         this.deleted = true;
