@@ -6,14 +6,12 @@ import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.users.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 
 @Entity
 @SuperBuilder
 @Getter
-@Setter
 @NoArgsConstructor
 public class Comment extends SoftDeletetionEntity {
 
@@ -35,5 +33,9 @@ public class Comment extends SoftDeletetionEntity {
     public void linkPost(Post post) { // 연관관계 편의 메소드
         this.post = post;
         post.getComments().add(this);
+    }
+
+    public void editContent(String content) {
+        this.content = content;
     }
 }
