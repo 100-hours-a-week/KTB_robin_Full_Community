@@ -23,4 +23,8 @@ public class PostView extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     @MapsId
     private Post post;
+
+    public void plusViewCount() {
+        this.viewCount++;
+    }
 }
