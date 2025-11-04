@@ -6,6 +6,7 @@ import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
 import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
+import ktb3.fullstack.week4.dto.posts.PostEditRequest;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import ktb3.fullstack.week4.service.comments.CommentService;
@@ -60,7 +61,7 @@ public class PostController implements PostApi {
     public ApiResponse<Void> editPost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("id") long postId,
-            @Valid @RequestPart PostUploadRequeset dto,
+            @Valid @RequestPart PostEditRequest dto,
             @RequestPart(required = false) MultipartFile image) {
         postService.editPost(userId, postId, dto, image);
         return ApiResponse.ok("post_edit_success");
