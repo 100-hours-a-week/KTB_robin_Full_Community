@@ -22,6 +22,8 @@ public class PostDomainBuilder {
         PostImage postImage = PostImage.builder()
             .post(post)
             .imageUrl(postImageUrl)
+            .displayOrder(1)
+            .isPrimary(true)
             .build();
 
         postImage.linkPost(post);
