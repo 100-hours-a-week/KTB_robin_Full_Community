@@ -1,7 +1,5 @@
 package ktb3.fullstack.week4.api.post;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
 import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
@@ -10,7 +8,9 @@ import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
-import ktb3.fullstack.week4.service.PostService;
+import ktb3.fullstack.week4.service.comments.CommentService;
+import ktb3.fullstack.week4.service.likes.LikeService;
+import ktb3.fullstack.week4.service.posts.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,24 +23,14 @@ import org.springframework.web.multipart.MultipartFile;
 @AccessTokenExpireResponse
 public class PostController implements PostApi {
     private final PostService postService;
+    private final CommentService commentService;
+    private final LikeService likeService;
 
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> uploadPost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
-            @Parameter(
-                    name = "dto",
-                    description = "게시글 내용(JSON)",
-                    required = true,
-                    content = @Content(mediaType = "application/json")
-            )
             @Valid @RequestPart PostUploadRequeset dto,
-            @Parameter(
-                    name = "image",
-                    description = "게시글 이미지 파일(선택)",
-                    required = false,
-                    content = @Content(mediaType = "multipart/form-data")
-            )
             @RequestPart(required = false) MultipartFile image) {
             postService.uploadPost(userId, dto, image);
             return ApiResponse.ok("post_upload_success");
@@ -92,7 +82,7 @@ public class PostController implements PostApi {
     public ApiResponse<Void> addLike(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("id") long postId) {
-        postService.likePost(userId, postId);
+        likeService.likePost(userId, postId);
         return ApiResponse.ok("post_like_success");
     }
 
@@ -102,7 +92,7 @@ public class PostController implements PostApi {
     public ApiResponse<Void> removeLike(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("id") long postId) {
-        postService.unlikePost(userId, postId);
+        likeService.unlikePost(userId, postId);
         return ApiResponse.ok("post_unlike_success");
     }
 
@@ -113,7 +103,7 @@ public class PostController implements PostApi {
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("postId") long postId,
             @RequestParam("content") String content) {
-        postService.addComment(userId, postId, content);
+        commentService.addComment(userId, postId, content);
         return ApiResponse.ok("comment_add_success");
     }
 
@@ -124,7 +114,7 @@ public class PostController implements PostApi {
             @PathVariable("postId") long postId,
             @PathVariable("commentId") long commentId,
             @RequestParam("content") String content) {
-        postService.editComment(userId, postId, commentId, content);
+        commentService.editComment(userId, postId, commentId, content);
         return ApiResponse.ok("comment_edit_success");
     }
 
@@ -134,7 +124,7 @@ public class PostController implements PostApi {
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("postId") long postId,
             @PathVariable("commentId") long commentId) {
-        postService.removeComment(userId, postId, commentId);
+        commentService.removeComment(userId, postId, commentId);
         return ApiResponse.ok("comment_remove_success");
     }
 
