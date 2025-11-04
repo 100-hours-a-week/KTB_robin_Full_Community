@@ -6,6 +6,7 @@ import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.users.User;
+import ktb3.fullstack.week4.dto.posts.PostEditRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
