@@ -9,10 +9,13 @@ import org.springframework.stereotype.Component;
 public class CommentDomainBuilder {
 
     public Comment buildComment(User user, Post post, String content) {
-        return Comment.builder()
+        Comment comment = Comment.builder()
                 .content(content)
                 .user(user)
                 .post(post)
                 .build();
+
+        comment.linkPost(post);
+        return comment;
     }
 }

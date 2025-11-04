@@ -19,9 +19,12 @@ public class PostDomainBuilder {
     }
 
     public PostImage buildPostImage(Post post, String postImageUrl) {
-        return PostImage.builder()
+        PostImage postImage = PostImage.builder()
             .post(post)
             .imageUrl(postImageUrl)
             .build();
+
+        postImage.linkPost(post);
+        return postImage;
     }
 }
