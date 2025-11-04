@@ -1,7 +1,5 @@
 package ktb3.fullstack.week4.service.users;
 
-import ktb3.fullstack.week4.common.error.codes.FileError;
-import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.security.PasswordHasher;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.users.User;
@@ -18,9 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Slf4j
@@ -37,6 +32,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final ProfileImageRepository profileImageRepository;
+
+    private final UserDeleteFacade userDeleteFacade;
 
 
     @Value("${file.profileDir}")
@@ -64,10 +61,7 @@ public class UserService {
         return new NicknameUpdateResponse(newNickname);
     }
 
-    // 비밀번호 변경: 존재 확인 → 해시 적용 → 저장(향후 Store/Repository 메서드 추가 시 연결)
-    // 여기서 비밀번호를 변경한다면, @Tranasctional의 범위 안에있고,
-    // 영속성 컨텍스트가 관리하는 user를 꺼낼경우 save 하지 않아도됨
-    // 이거 테스트 코드 필요하다.
+
     @Transactional
     public void changePassword(long userId, PasswordUpdateRequest newPassword) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
@@ -96,7 +90,7 @@ public class UserService {
                 .displayOrder(1)
                 .build();
 
-        List<ProfileImage> profileImages = profileImageRepository.findAllByUserIdAndDeletedIsFalse(userId);
+        List<ProfileImage> profileImages = profileImageRepository.findAllByUserId(userId);
         if (!profileImages.isEmpty()) {
             for (ProfileImage image : profileImages) {
                 image.adjustDisplayOrder(); // displayOrder 순서 1씩 뒤로 밀기
@@ -114,31 +108,22 @@ public class UserService {
     // 프로필 이미지 삭제
     @Transactional
     public String deleteProfileImage(long userId) {
-        User user = errorCheckService.checkCanNotFoundUser(userId);
-        ProfileImage primaryProfileImage = profileImageRepository.findByIsPrimaryIsTrue();
-        user.getProfileImages().remove(primaryProfileImage);
+        errorCheckService.checkCanNotFoundUser(userId);
+        ProfileImage primaryProfileImage = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(userId);
+        primaryProfileImage.deleteEntity();
+        // 프로필 이미지 1장 : 삭제 -> 즉시 새로운 사진 등록 필요
+        // 프로필 이미지 2장 이상 : 삭제 -> 즉시 프로필 사진 불러오기 필요
 
-        Path urlToDelete = Paths.get(primaryProfileImage.getImageUrl());
-        try {
-            boolean deleted = Files.deleteIfExists(urlToDelete);
-            if (!deleted) {
-                throw new ApiException(FileError.IMAGE_NOT_FOUND);
-            }
-        } catch (IOException e) {
-            throw new ApiException(FileError.IMAGE_NOT_FOUND);
-        }
-
-        String existingProfileImageUrl = primaryProfileImage.getImageUrl();
-        return existingProfileImageUrl;
+        return primaryProfileImage.getImageUrl();
     }
 
     // 이후개발) 프로필 사진 history 에서 선택한 이미지만 삭제
 
 
-    // 회원 탈퇴 : 사용자 삭제
+    // 회원 탈퇴
     @Transactional
     public void withdrawMemberShip(long userId) {
         errorCheckService.checkCanNotFoundUser(userId);
-        userRepository.findById(userId).get().deleteUser(); // Soft Delete 적용
+        userDeleteFacade.deleteUser(userId); // 연관 데이터까지 모두 Soft Delete 적용하는 퍼사드
     }
 }

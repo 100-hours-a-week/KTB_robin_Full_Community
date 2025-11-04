@@ -1,7 +1,5 @@
 package ktb3.fullstack.week4.service.users;
 
-import ktb3.fullstack.week4.common.error.codes.UserError;
-import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
@@ -12,10 +10,8 @@ import ktb3.fullstack.week4.repository.auth.RefreshTokenRepository;
 import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.repository.likes.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
-import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
