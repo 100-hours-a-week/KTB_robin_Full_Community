@@ -57,7 +57,7 @@ public class PostController implements PostApi {
     }
 
     @Override
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> editPost(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
             @PathVariable("id") long postId,

@@ -9,6 +9,7 @@ import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.availabilities.AvailabilityService;
 import ktb3.fullstack.week4.service.users.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +23,7 @@ public class UserController implements UserApi {
     private final AvailabilityService availabilityService;
 
     @Override
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> register(
             @Valid @RequestPart JoinRequest dto,
             @RequestPart MultipartFile image) {
@@ -34,7 +35,7 @@ public class UserController implements UserApi {
     // 회원정보 수정 페이지 진입 api
     @Override
     @AccessTokenExpireResponse
-    @GetMapping("/me") //회원정보 수정 - 닉네임
+    @GetMapping("/me")
     public ApiResponse<UserEditPageResponse> getUserInfoForEditPage(
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
             UserEditPageResponse result = userService.getUserInfoForEditPage(userId);
@@ -73,7 +74,7 @@ public class UserController implements UserApi {
 
     @Override
     @AccessTokenExpireResponse
-    @PatchMapping("/me/profile-image")
+    @PatchMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProfileImageUrlResponse> registerNewProfileImage(
             @RequestPart(value = "profile_image") MultipartFile newProfileImage,
             @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
