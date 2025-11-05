@@ -15,6 +15,8 @@ import java.util.List;
 @SuperBuilder
 @Getter
 @NoArgsConstructor
+@Table(name = "users")
+@SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
 public class User extends SoftDeletetionEntity {
 
     @Id
@@ -42,6 +44,7 @@ public class User extends SoftDeletetionEntity {
     public void changeNickName(String newNickname) {
         nickname = newNickname;
     }
+
     public void changePassword(String newPassword) {
         hashedPassword = newPassword;
     }
