@@ -50,7 +50,7 @@ public class UserService {
         // 로컬 폴더에 실제 이미지 저장
         profileImageService.transferImageToLocalDirectory(image, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.profileImageBuilder(profileImageUrl);
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(profileImageUrl);
 
         profileImage.linkUser(user);
 
@@ -58,16 +58,17 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     // 이메일, 닉네임 조회
+    @Transactional(readOnly = true)
     public UserEditPageResponse getUserInfoForEditPage(long userId) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
         UserEditPageResponse dto = userDomainBuilder.buildUserPageResponse(user.getEmail(), user.getNickname());
+        System.out.println();
         return dto;
     }
 
-    @Transactional
     // 닉네임 변경: 존재 확인 → 저장소 갱신
+    @Transactional
     public NicknameUpdateResponse changeNickname(long userId, NicknameUpdateRequest dto) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
         String newNickname = dto.getNewNickname();
@@ -94,7 +95,7 @@ public class UserService {
         // 로컬 폴더에 실제 이미지 저장
         profileImageService.transferImageToLocalDirectory(newProfileImage, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.profileImageBuilder(profileImageUrl);
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(profileImageUrl);
 
         List<ProfileImage> profileImages = profileImageRepository.findAllByUserId(userId);
         if (!profileImages.isEmpty()) {

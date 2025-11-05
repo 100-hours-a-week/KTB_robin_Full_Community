@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-//public interface ProfileImageRepository extends ImageRepository {
 public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long> {
 
     ProfileImage save(ProfileImage profileImage);

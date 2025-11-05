@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtTokenProvider;
 import ktb3.fullstack.week4.common.error.codes.AuthError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
+import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.common.security.PasswordHasher;
 import ktb3.fullstack.week4.common.util.CookieUtil;

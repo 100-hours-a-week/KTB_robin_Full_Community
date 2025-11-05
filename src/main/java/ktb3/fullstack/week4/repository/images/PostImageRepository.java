@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-//public interface PostImageRepository extends ImageRepository {
 public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
     PostImage save(PostImage postImage);
@@ -19,9 +18,8 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
     void deleteById(Long id);
 
-    List<PostImage> findAllByPostId(Long postId);
 
-    Optional<PostImage> findByIsPrimaryIsTrue();
+    Optional<PostImage> findByPostIdAndIsPrimaryIsTrue(Long postId);
 
     @Query("select pi " +
             "from PostImage pi " +

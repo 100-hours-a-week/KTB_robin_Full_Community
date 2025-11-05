@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @NoArgsConstructor
+@Table(name = "likes") // 테이블 명으로 예약어 피하기
 public class Like extends SoftDeletetionEntity {
 
     @Id

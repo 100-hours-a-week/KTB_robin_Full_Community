@@ -10,7 +10,6 @@ import ktb3.fullstack.week4.dto.posts.PostEditRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.lang.NonNull;
 
@@ -22,7 +21,6 @@ import java.util.List;
 @Entity
 @SuperBuilder
 @Getter
-@Setter
 @NoArgsConstructor
 public class Post extends SoftDeletetionEntity {
 
