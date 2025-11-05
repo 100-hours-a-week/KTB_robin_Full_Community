@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UserError implements ErrorCode {
 
+    DEACTIVATED_ACCOUNT(HttpStatus.BAD_REQUEST, "deactivated_account"),
     CANNOT_FOUND_USER(HttpStatus.NOT_FOUND, "cannot_found_user"),
     EXISTING_EMAIL(HttpStatus.CONFLICT, "existing_email"),
     EXISTING_NICKNAME(HttpStatus.CONFLICT, "existing_nickname");
