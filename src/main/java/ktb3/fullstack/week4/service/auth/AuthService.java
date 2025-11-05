@@ -44,6 +44,11 @@ public class AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD));
 
+        // 탈퇴한(비활성화된) 사용자 검사
+        if(user.isDeleted()) {
+            throw new ApiException(UserError.DEACTIVATED_ACCOUNT);
+        }
+
         // 비밀번호 유효성 검사
         if (!passwordHasher.matches(dto.getPassword(), user.getHashedPassword())) {
             throw new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD);
