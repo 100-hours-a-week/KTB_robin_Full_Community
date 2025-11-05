@@ -7,12 +7,14 @@ import ktb3.fullstack.week4.domain.users.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @SuperBuilder
 @Getter
 @NoArgsConstructor
 @Table(name = "likes") // 테이블 명으로 예약어 피하기
+@SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
 public class Like extends SoftDeletetionEntity {
 
     @Id

@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.List;
 @SuperBuilder
 @Getter
 @NoArgsConstructor
+@SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
 public class Post extends SoftDeletetionEntity {
 
     @Id
@@ -41,14 +43,17 @@ public class Post extends SoftDeletetionEntity {
 
 
     @Builder.Default
+    @SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
+    @SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
     @OneToMany(mappedBy = "post")
     private List<Like> likes = new ArrayList<>();
 
     @Builder.Default
+    @SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
     @OneToMany(mappedBy = "post")
     private List<PostImage> postImages = new ArrayList<>();
 

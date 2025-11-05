@@ -5,11 +5,13 @@ import ktb3.fullstack.week4.domain.posts.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @SuperBuilder
 @Getter
 @NoArgsConstructor
+@SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
 public class PostImage extends Image {
 
     @Id

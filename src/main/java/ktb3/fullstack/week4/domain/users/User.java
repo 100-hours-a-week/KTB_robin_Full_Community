@@ -5,6 +5,7 @@ import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class User extends SoftDeletetionEntity {
     private LocalDateTime deletedAt;
 
     @Builder.Default
+    @SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
     @OneToMany(mappedBy = "user")
     private List<ProfileImage> profileImages = new ArrayList<>();
 
