@@ -32,6 +32,7 @@ public class User extends SoftDeletetionEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<ProfileImage> profileImages = new ArrayList<>();
 

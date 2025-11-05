@@ -7,6 +7,7 @@ import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostEditRequest;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,14 +42,18 @@ public class Post extends SoftDeletetionEntity {
     private LocalDateTime deletedAt;
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Like> likes = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<PostImage> postImages = new ArrayList<>();
+
 
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     private PostView postView;
