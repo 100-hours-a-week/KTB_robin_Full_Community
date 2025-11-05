@@ -30,7 +30,7 @@ public interface UserApi {
                     })
             )
     })
-    ApiResponse<Void> register(@Valid @RequestBody JoinRequest dto);
+    ApiResponse<Void> register(@Valid @RequestPart JoinRequest dto, @RequestPart MultipartFile image);
 
     @Operation(summary = "회원 정보 조회(간략)", description = "회원의 이메일과 닉네임 정보를 전달합니다.")
     @ApiResponses(value = {

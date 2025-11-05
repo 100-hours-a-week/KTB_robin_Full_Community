@@ -6,16 +6,15 @@ import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.repository.images.ProfileImageRepository;
 import ktb3.fullstack.week4.repository.users.UserRepository;
+import ktb3.fullstack.week4.service.images.ImageDomainBuilder;
+import ktb3.fullstack.week4.service.images.ProfileImageService;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -35,17 +34,31 @@ public class UserService {
 
     private final UserDeleteFacade userDeleteFacade;
 
+    private final ProfileImageService profileImageService;
 
-    @Value("${file.profileDir}")
-    private String folderPath;
+    private final ImageDomainBuilder imageDomainBuilder;
 
 
-    public void register(JoinRequest dto) {
+
+    @Transactional
+    public void register(JoinRequest dto, MultipartFile image) {
         String hashedPassword = passwordHasher.hash(dto.getPassword());
         User user = userDomainBuilder.buildUser(hashedPassword, dto);
+
+        // 이미지 저장할 경로 생성
+        String profileImageUrl = profileImageService.makeImagePathString(image);
+        // 로컬 폴더에 실제 이미지 저장
+        profileImageService.transferImageToLocalDirectory(image, profileImageUrl);
+
+        ProfileImage profileImage = imageDomainBuilder.profileImageBuilder(profileImageUrl);
+
+        profileImage.linkUser(user);
+
+        profileImageRepository.save(profileImage);
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     // 이메일, 닉네임 조회
     public UserEditPageResponse getUserInfoForEditPage(long userId) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
@@ -53,6 +66,7 @@ public class UserService {
         return dto;
     }
 
+    @Transactional
     // 닉네임 변경: 존재 확인 → 저장소 갱신
     public NicknameUpdateResponse changeNickname(long userId, NicknameUpdateRequest dto) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
@@ -73,22 +87,14 @@ public class UserService {
     @Transactional
     public String changeProfileImage(long userId, MultipartFile newProfileImage) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
-        String profileImageUrl = folderPath + newProfileImage.getOriginalFilename();
 
-        // (리팩토링) 에러 등록 및 관리 필요
-        try {
-            newProfileImage.transferTo(new File(profileImageUrl));
-        } catch (IOException e) {
-            System.out.println("이미지 이동 중 문제 발생!");
-            log.info("이미지 이동 중 문제 발생!");
-        }
+        // 이미지 저장할 경로 생성
+        String profileImageUrl = profileImageService.makeImagePathString(newProfileImage);
 
-        // 프로필 이미지 객체 생성 -> 도메인빌더 메소드로 갈아끼우기?
-        ProfileImage profileImage = ProfileImage.builder()
-                .imageUrl(profileImageUrl)
-                .isPrimary(true)
-                .displayOrder(1)
-                .build();
+        // 로컬 폴더에 실제 이미지 저장
+        profileImageService.transferImageToLocalDirectory(newProfileImage, profileImageUrl);
+
+        ProfileImage profileImage = imageDomainBuilder.profileImageBuilder(profileImageUrl);
 
         List<ProfileImage> profileImages = profileImageRepository.findAllByUserId(userId);
         if (!profileImages.isEmpty()) {

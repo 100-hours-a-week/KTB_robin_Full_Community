@@ -23,9 +23,11 @@ public class UserController implements UserApi {
 
     @Override
     @PostMapping
-    public ApiResponse<Void> register(@Valid @RequestBody JoinRequest dto) {
-        availabilityService.checkRegisterAvailability(dto);
-        userService.register(dto);
+    public ApiResponse<Void> register(
+            @Valid @RequestPart JoinRequest dto,
+            @RequestPart MultipartFile image) {
+        availabilityService.checkRegisterAvailability(dto, image);
+        userService.register(dto, image);
         return ApiResponse.ok("register_success");
     }
 
