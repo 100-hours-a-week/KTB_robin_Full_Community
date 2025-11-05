@@ -66,4 +66,8 @@ public class Post extends SoftDeletetionEntity {
         this.title = dto.getTitle();
         this.content = dto.getContent();
     }
+
+    public void linkPostView(PostView postView) {
+        this.postView = postView;
+    }
 }
