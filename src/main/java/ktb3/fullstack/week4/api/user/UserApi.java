@@ -30,7 +30,21 @@ public interface UserApi {
                     })
             )
     })
-    ApiResponse<Void> register(@Valid @RequestPart JoinRequest dto, @RequestPart MultipartFile image);
+    ApiResponse<Void> register(
+            @Parameter(
+                    name = "dto",
+                    description = "가입 정보(JSON)",
+                    required = true,
+                    content = @Content(mediaType = "application/json")
+            )
+            @Valid @RequestPart JoinRequest dto,
+            @Parameter(
+                    name = "image",
+                    description = "프로필 이미지 파일",
+                    content = @Content(mediaType = "multipart/form-data")
+            )
+            @RequestPart(value = "image") MultipartFile image
+    );
 
     @Operation(summary = "회원 정보 조회(간략)", description = "회원의 이메일과 닉네임 정보를 전달합니다.")
     @ApiResponses(value = {
