@@ -6,12 +6,18 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    open-in-view: false
+    open-in-view: false  # OSIV 해제
     hibernate:
-      ddl-auto: create   # 개발 중에는 create / create-drop / update 중 선택
+      ddl-auto: validate   # 개발 중에는 create / create-drop / update 중 선택
     properties:
       hibernate:
         format_sql: true
+
+file:
+  profileDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/images/profile/
+  postDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/images/post/
+
+
 
 logging:
   level:
