@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
+import ktb3.fullstack.week4.dto.posts.PostEditRequest;
 import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import org.springframework.web.bind.annotation.*;
@@ -243,7 +244,7 @@ public interface PostApi {
                     required = true,
                     content = @Content(mediaType = "application/json")
             )
-            @Valid @RequestPart PostUploadRequeset dto,
+            @Valid @RequestPart PostEditRequest dto,
             @Parameter(
                     name = "image",
                     description = "게시글 이미지 파일(선택)",
