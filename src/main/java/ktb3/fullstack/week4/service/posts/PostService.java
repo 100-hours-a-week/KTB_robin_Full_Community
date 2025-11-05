@@ -20,6 +20,8 @@ import ktb3.fullstack.week4.repository.posts.PostRepository;
 import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.repository.posts.PostViewRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
+import ktb3.fullstack.week4.service.images.ImageDomainBuilder;
+import ktb3.fullstack.week4.service.images.PostImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +42,7 @@ import java.util.NoSuchElementException;
 public class PostService {
 
     private final PostDomainBuilder postDomainBuilder;
+    private final ImageDomainBuilder imageDomainBuilder;
 
     private final ErrorCheckServiceImpl errorCheckService;
 
@@ -51,6 +54,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
 
     private final PostDeleteFacade postDeleteFacade;
+    private final PostImageService postImageService;
 
     @Value("${file.postDir}")
     private String folderPath;
@@ -61,20 +65,18 @@ public class PostService {
 
         User user = errorCheckService.checkCanNotFoundUser(userId);
 
-        String postImageUrl = folderPath + image.getOriginalFilename();
-
-        // (리팩토링 필요) 에러 등록 및 관리
-        try {
-            image.transferTo(new File(postImageUrl));
-        } catch (IOException e) {
-            System.out.println("이미지 이동 중 문제 발생!");
-            log.info("이미지 이동 중 문제 발생!");
-        }
-
         Post post = postDomainBuilder.buildPost(dto, user);
-        PostImage postImage = postDomainBuilder.buildPostImage(post, postImageUrl);
         postRepository.save(post);
-        postImageRepository.save(postImage);
+
+        PostView postView = postDomainBuilder.buildPostView(post);
+        postViewRepository.save(postView);
+
+        if(image != null) {
+            String postImageUrl = postImageService.makeImagePathString(image);
+            postImageService.transferImageToLocalDirectory(image, postImageUrl);
+            PostImage postImage = imageDomainBuilder.buildPostImage(post, postImageUrl); // 대표사진 추가
+            postImageRepository.save(postImage);
+        }
     }
 
     // 게시글 목록조회
@@ -222,7 +224,7 @@ public class PostService {
             }
 
             // 새 이미지 업로드
-            PostImage newPrimaryImage = postDomainBuilder.buildPostImage(post, postImageUrl);
+            PostImage newPrimaryImage = imageDomainBuilder.buildPostImage(post, postImageUrl);
             postImageRepository.save(newPrimaryImage);
         }
     }

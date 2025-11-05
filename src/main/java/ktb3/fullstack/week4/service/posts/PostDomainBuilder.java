@@ -2,6 +2,7 @@ package ktb3.fullstack.week4.service.posts;
 
 import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.posts.Post;
+import ktb3.fullstack.week4.domain.posts.PostView;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import org.springframework.stereotype.Component;
@@ -18,15 +19,13 @@ public class PostDomainBuilder {
                 .build();
     }
 
-    public PostImage buildPostImage(Post post, String postImageUrl) {
-        PostImage postImage = PostImage.builder()
-            .post(post)
-            .imageUrl(postImageUrl)
-            .displayOrder(1)
-            .isPrimary(true)
-            .build();
+    public PostView buildPostView(Post post) {
+        PostView postView = PostView.builder()
+                .post(post)
+                .viewCount(0)
+                .build();
 
-        postImage.linkPost(post);
-        return postImage;
+        post.linkPostView(postView);
+        return postView;
     }
 }
