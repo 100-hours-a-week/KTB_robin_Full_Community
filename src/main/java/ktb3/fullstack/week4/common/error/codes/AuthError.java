@@ -11,7 +11,8 @@ public enum AuthError implements ErrorCode {
 
     INVALID_EMAIL_OR_PASSWORD(HttpStatus.UNAUTHORIZED, "invalid_email_or_password"),
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "access_token_expired"),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "refresh_token_expired");
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "refresh_token_expired"),
+    REFRESH_TOKEN_VALIDATION_FAIL(HttpStatus.UNAUTHORIZED, "refresh_token_validation_fail");
 
     private final HttpStatus status;
     private final String message;

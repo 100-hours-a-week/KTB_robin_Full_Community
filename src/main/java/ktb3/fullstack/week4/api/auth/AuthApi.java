@@ -79,7 +79,7 @@ public interface AuthApi {
                     })
             )
     })
-    ApiResponse<RefreshResponse> refresh(HttpServletRequest request);
+    ApiResponse<RefreshResponse> refresh(HttpServletRequest request, HttpServletResponse response);
 
     @Operation(summary = "로그아웃", description = "로그아웃합니다.")
     @ApiResponses(value = {

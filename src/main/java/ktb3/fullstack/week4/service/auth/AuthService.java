@@ -54,6 +54,9 @@ public class AuthService {
 
         // 액세스, 리프레시 토큰 발급
         String access = tokenProvider.generateAccessToken(userId);
+
+        // 데이터베이스에 이미 존재하는 사용자의 refresh 를 삭제하고 새로만들기
+        refreshTokenRepository.deleteAllByUserId(userId);
         String refresh = tokenProvider.generateRefreshToken(userId);
 
         // refreshToken 저장소 등록

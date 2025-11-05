@@ -5,7 +5,7 @@ import ktb3.fullstack.week4.dto.auth.LoginResponse;
 import ktb3.fullstack.week4.dto.auth.LoginRequest;
 import ktb3.fullstack.week4.dto.auth.RefreshResponse;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
-import ktb3.fullstack.week4.service.AuthService;
+import ktb3.fullstack.week4.service.auth.AuthService;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,8 +31,8 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/refresh")
-    public ApiResponse<RefreshResponse> refresh(HttpServletRequest request) {
-        RefreshResponse body = authService.refresh(request);
+    public ApiResponse<RefreshResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+        RefreshResponse body = authService.refresh(request, response);
         return ApiResponse.ok(body, "access_token_refreshed");
     }
 
