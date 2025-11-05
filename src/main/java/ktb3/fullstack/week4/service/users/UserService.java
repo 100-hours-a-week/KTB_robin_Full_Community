@@ -63,7 +63,6 @@ public class UserService {
     public UserEditPageResponse getUserInfoForEditPage(long userId) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
         UserEditPageResponse dto = userDomainBuilder.buildUserPageResponse(user.getEmail(), user.getNickname());
-        System.out.println();
         return dto;
     }
 
@@ -77,6 +76,7 @@ public class UserService {
     }
 
 
+    // 비밀번호 변경
     @Transactional
     public void changePassword(long userId, PasswordUpdateRequest newPassword) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
