@@ -50,7 +50,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         }
         // JPEG, PNG 만 받도록 처리 -> invalid file type
         String imageType = image.getContentType();
-        if(!(imageType.equals("JPEG") || imageType.equals("PNG"))) {
+        if(!(imageType.equals("image/jpeg") || imageType.equals("image/png"))) {
             throw new ApiException(FileError.INVALID_FILE_TYPE);
         }
     }
