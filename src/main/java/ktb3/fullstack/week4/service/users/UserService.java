@@ -23,20 +23,19 @@ import java.util.List;
 public class UserService {
 
     private final UserDomainBuilder userDomainBuilder;
+    private final ImageDomainBuilder imageDomainBuilder;
 
     private final PasswordHasher passwordHasher;
 
     private final ErrorCheckServiceImpl errorCheckService;
+    private final ProfileImageService profileImageService;
 
     private final UserRepository userRepository;
-
     private final ProfileImageRepository profileImageRepository;
 
     private final UserDeleteFacade userDeleteFacade;
 
-    private final ProfileImageService profileImageService;
 
-    private final ImageDomainBuilder imageDomainBuilder;
 
 
 

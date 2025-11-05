@@ -23,16 +23,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDeleteFacade {
 
-    private final PostRepository postRepository; // postimage 는 더티체킹으로 함께 삭제
-
+    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-
     private final LikeRepository likeRepository;
-
     private final RefreshTokenRepository refreshTokenRepository;
 
     private final ErrorCheckServiceImpl errorCheckService;
-
     private final PostDeleteFacade postDeleteFacade;
 
     // 반드시 상위 트랜잭션 안에서만 실행되도록 강제(호출 측에서 @Transactional)
