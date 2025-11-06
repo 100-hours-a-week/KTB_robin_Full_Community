@@ -45,6 +45,9 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     public void checkImageAvailability(MultipartFile image) {
         final long MAX_SIZE = 10L * 1024 * 1024;
+        if(image == null) {
+            throw new ApiException(FileError.IMAGE_NOT_FOUND);
+        }
         if(image.getSize() > MAX_SIZE) {
             throw new ApiException(FileError.IMAGE_SIZE_TOO_BIG);
         }
