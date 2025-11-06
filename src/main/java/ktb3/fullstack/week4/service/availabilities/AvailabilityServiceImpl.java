@@ -8,6 +8,7 @@ import ktb3.fullstack.week4.dto.users.NicknameUpdateRequest;
 import ktb3.fullstack.week4.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -17,6 +18,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     // 회원가입 시 이메일과 닉네임의 가용성 검사
     @Override
+    @Transactional(readOnly = true)
     public void checkRegisterAvailability(JoinRequest dto, MultipartFile image) {
         checkEmailAvailability(dto.getEmail());
         checkNicknameAvailability(dto.getNickname());
@@ -25,11 +27,13 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     // 닉네임 변경 시 변경 희망 닉네임의 가용성 검사
     @Override
+    @Transactional(readOnly = true)
     public void checkNewNicknameAvailability(NicknameUpdateRequest dto) {
         checkNicknameAvailability(dto.getNewNickname());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void checkEmailAvailability(String email) {
         if(userRepository.existsByEmail(email)) {
             throw new ApiException(UserError.EXISTING_EMAIL);
@@ -37,6 +41,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void checkNicknameAvailability(String nickname) {
         if(userRepository.existsByNickname(nickname)) {
             throw new ApiException(UserError.EXISTING_NICKNAME);
