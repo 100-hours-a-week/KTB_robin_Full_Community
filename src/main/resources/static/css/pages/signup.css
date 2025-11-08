@@ -1,0 +1,94 @@
+/* signup.css */
+/* 공통 규격을 유지하면서, 회원가입에 필요한 최소 보강만 추가 */
+
+/* 프로필 업로더 */
+.avatar-uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.avatar-label {
+    width: 100%;
+    max-width: var(--container);
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.avatar-title {
+    margin-right: 6px;
+    margin-bottom: 4px;
+}
+
+.avatar-trigger {
+    width: 136px;
+    height: 136px;
+    border-radius: 50%;
+    background: #d4d4d8; /* 스크린샷의 회색 원 느낌 */
+    color: #3f3f46;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px; /* + 아이콘 크기 */
+    user-select: none;
+    cursor: pointer;
+    border: 1px solid #c4c4c7;
+    transition: transform .15s ease, background-color .15s ease;
+}
+
+.avatar-trigger:hover {
+    background: #cfcfd4;
+    transform: translateY(-1px);
+}
+
+.avatar-trigger:active {
+    transform: translateY(0);
+}
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+/* 폼 간격 보정(로그인과 동일 리듬 유지) */
+.card--auth {
+    padding: 0 8px;
+}
+
+.card-title { /* 제목과 필드 사이 간격 */
+    margin-top: 30%;
+    margin-bottom: 12px;
+}
+
+/* helper 텍스트와 다음 라벨 사이 4px 간격을 위해 간격 규칙 오버라이드 */
+.form .form-group {
+    margin-bottom: 0;          /* 공통의 하단 간격 제거 */
+}
+
+/* helper 자체의 하단 간격 제거 */
+.form .form-group .helper {
+    margin: 6px 0 0 0;         /* top 6px, bottom 0 */
+}
+
+/* 다음 그룹 시작 간격을 4px로 설정 → 결과적으로 helper → 다음 label = 4px */
+.form .form-group + .form-group {
+    margin-top: 4px;
+}
+
+.form .form-group .label {
+    margin-bottom: 0;  /* 공통의 6px 제거 */
+}
+
+.form .form-group .input {
+    margin-top: 8px;   /* 라벨 바로 아래 간격 8px */
+}
+
+
