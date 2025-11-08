@@ -1,4 +1,5 @@
-import { isValidEmail, isValidPassword } from "../feature/auth/validator";
+import {login} from "../features/auth/api.js";
+import {isValidEmail, isValidPassword} from "../features/auth/validator.js";
 
 const emailEl = document.getElementById("email");
 const passwordEl = document.getElementById("password");
@@ -12,10 +13,10 @@ const invalidEmailOrPasswordMessage = "*올바른 이메일 혹은 비밀번호�
 const loginFailedThenRetryMessage = "*로그인에 실패했습니다. 잠시 후 다시 시도해주세요.";
 
 
-let redirectTimer = null; // 이거 사용되는 부분 이해 필요
+let redirectTimer = null;
 
 clearHelper();
-setButtonBusy(true);
+setButtonBusy(false);
 
 loginBtn.addEventListener("click", onSubmit);
 emailEl.addEventListener("input", onTyping);
@@ -47,14 +48,29 @@ async function onSubmit() {
     if (!pwdCheck.ok) {
         if (pwdCheck.reason === "empty") {
             showHelper(emptyPasswordMessage);
-            return;
+        } else {
+            showHelper(invalidPasswordMessage);
         }
-        showHelper(invalidPasswordMessage);
         return;
     }
 
     clearHelper();
     setButtonBusy(true);
+
+    try {
+        await login({ email, password: pwd });
+        window.location.href = "postList.html";
+    } catch (e) {
+        const msg = e?.message;
+        if (msg === "invalid_email_or_password") {
+            showHelper(invalidEmailOrPasswordMessage);
+        } else {
+            showHelper(loginFailedThenRetryMessage);
+        }
+    } finally {
+        setButtonBusy(false);
+    }
+
 }
 
 function onTyping() {
