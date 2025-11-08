@@ -1,0 +1,221 @@
+/* common.css */
+:root {
+    --bg: #f4f4f5;
+    --text: #000000;
+    --muted: #6b7280; /* gray-600 */
+    --border: #d1d5db; /* gray-300 */
+    --field: #9ca3af; /* gray-400 */
+    --primary: #bfaeff;
+    --primary-hover: #a08df3;
+    --danger: #ef4444;
+    --radius: 8px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --container: 420px;
+    /* 라벨 전용 폰트 변수 (필요 시 다른 페이지에서도 재사용) */
+    --font-label: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    /* 헤더 타이틀 전용(브랜드) 폰트 변수 */
+    --font-brand: 'Sandoll GogoRound', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Sandoll GogoRound 웹폰트 로드 (공통 1회 선언) */
+@font-face {
+    font-family: 'Sandoll GogoRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/SandollGogoRound.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Pretendard 로드 (입력 텍스트용) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* {
+    box-sizing: border-box
+}
+
+html, body {
+    height: 100%
+}
+
+body.app-body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.2px;
+}
+
+/* Header */
+.app-header {
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    height: 104px;
+    background: #fff0;
+    position: relative; /* 백 버튼 절대 배치 기준 */
+}
+
+.app-title {
+    /* 화면 크기와 무관하게 헤더의 정확한 중앙에 고정 */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-block;     /* 텍스트 너비에 맞춤 */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+
+    /* 타이포 */
+    font-family: var(--font-brand);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+/* 타이틀을 기준으로 항상 왼쪽에 살짝 붙는 이전 버튼 */
+.app-title .app-back {
+    position: absolute;
+    right: calc(100% + 128px);  /* 타이틀 바로 왼쪽 + 간격 12px */
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 버튼 크기: 2배 */
+    width: 64px;
+    height: 64px;
+
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 50%;
+    transition: background-color .15s ease, color .15s ease;
+    outline: none;
+}
+.app-title .app-back:hover { background: rgba(0,0,0,0.05); }
+.app-title .app-back:focus-visible { box-shadow: 0 0 0 2px rgba(0,0,0,0.25); }
+
+.app-back__icon {
+    font-size: 36px;           /* 버튼 확대에 맞춘 아이콘 크기 */
+    line-height: 1;
+}
+
+/* Main container centering */
+.app-main {
+    min-height: calc(100vh - 104px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+}
+
+/* Card (auth box) */
+.card {
+    width: 100%;
+    max-width: var(--container);
+}
+
+.card--auth {
+    padding: 0 8px
+}
+
+.card-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 100%;
+    margin: 0 0 3px 0;
+}
+
+/* Form controls */
+.form { width: 100% }
+
+/* 피그마: form-group 컨테이너 사이즈 기준 매핑 */
+.form-group {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* 첫 번째 그룹만 더 촘촘한 여백 필요 시 별도 조절 가능 */
+
+.label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-family: var(--font-label);
+}
+
+/* 입력 필드: 피그마 보더/라운드/높이 적용 */
+.input {
+    width: 100%;
+    height: 33px;                           /* height: 33 */
+    padding: 8px 12px;                      /* 높이 33에 맞춘 내부 여백 */
+    border: 1px solid rgba(0,0,0,1);        /* border: 1px solid #000 */
+    margin-top: 10px;
+    border-radius: 4px;                     /* radius: 4px */
+    background: #fff;
+    outline: none;
+}
+.input::placeholder { color: #000; opacity: 1; font-size: 14px}
+
+
+.input:focus {
+    border-color: #000; /* 블랙 보더 유지 */
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.06);
+}
+
+/* Helper text */
+.helper { font-size: 12px; margin: 6px 0 16px 2px; font-weight: 400}
+.helper--error { color: var(--danger)}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    transition: background-color .2s ease, opacity .2s ease;
+    font-weight: 600;
+}
+
+.btn--block {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.btn--primary {
+    color: #fff;
+    background: var(--primary);
+}
+
+.btn--primary:hover {
+    background: var(--primary-hover)
+}
+
+/* Sub link text under button */
+.sub-link {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 14px;
+}
+
+/* Reusable state/utility classes */
+.is-hidden { visibility: hidden; }
+.is-visible { visibility: visible; }
+
+.btn.is-busy,
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
