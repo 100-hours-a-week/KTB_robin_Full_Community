@@ -1,0 +1,227 @@
+/* src/main/resources/static/css/pages/postDetail.css */
+/* 레이아웃(페이지 고유) */
+.post {
+    max-width: 592px; /* 구분선 기준 */
+    margin: 0 auto;
+    padding: 24px 0 64px; /* 좌우 패딩 제거 → 내부 콘텐츠 폭 = 592px */
+    background: var(--bg);
+}
+
+/* 카드 느낌 제거 */
+.post-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    width: 100%;
+}
+
+/* 544px로 중앙 정렬해야 하는 공통 묶음 */
+.constrained-544 {
+    max-width: 544px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+/* 헤더 - 좌/우 같은 라인 높이 정렬 */
+.post-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.post-title {
+    margin: 0 0 12px 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.post-time {
+    font-size: 12px;
+    color: var(--text);
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* 필요 여백 유지 (요구사항에 따라 35px) */
+.post-actions {
+    margin-top: 35px;
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* 미디어 */
+.post-media {
+    margin: 12px 0;
+}
+
+.post-media .media-placeholder {
+    width: 544px;
+    margin: auto;
+    height: 306px;
+    background: rgba(217, 217, 217, 1);
+    border: none;
+    border-radius: 0;
+}
+
+/* 본문 */
+.post-body {
+    color: var(--text);
+    line-height: 141%;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+/* 통계 바: 컨테이너 자체 392 x 128 중앙 정렬 */
+.post-stats {
+    width: 392px;
+    height: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.stat {
+    width: 116px;
+    height: 77px;
+    flex: 1 1 0;
+    background: rgba(217, 217, 217, 1);
+    border: none;
+    border-radius: 16px;
+    margin-top: 32px;
+    margin-left: 4px;
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.stat-num {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 1px;
+    color: var(--text);
+}
+
+.stat-label {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.comment-write {
+    width: 592px;
+    margin: 8px 0px 24px 0px;
+}
+
+.comment-write__box {
+    width: 592px;
+    height: 169px;
+    border-radius: 16px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.comment-write__editor {
+    margin: 24px 24px 0 24px;
+}
+
+.comment-textarea {
+    width: 544px;
+    height: 94px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    font: inherit;
+    color: var(--text);
+    display: block;
+}
+
+.comment-write__divider {
+    width: 592px;
+    height: 1px;
+    margin: 0;
+    background: rgba(217, 217, 217, 1);
+    border: 0;
+}
+
+.comment-write__actions {
+    margin-top: 6px;            /* 구분선으로부터 13px */
+    padding: 0 8px 0 24px;       /* 오른쪽 8px, 왼쪽 24px */
+    display: flex;
+    justify-content: flex-end;
+}
+
+.comment-list {
+    width: 544px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 아이템 간 세로 간격은 유지 */
+}
+
+/* 댓글 아이템: 흰 배경 카드 느낌 제거 -> 레이어 위에 바로 얹힌 느낌 */
+.comment-item {
+    border: none;            /* 테두리 제거 */
+    border-radius: 0;        /* 라운드 제거 */
+    padding: 0;              /* 내부 여백 제거 */
+    background: transparent; /* 배경 제거 */
+}
+
+/* 아이템 간 간격이 gap 외 추가로 필요하면 여기서 조정 가능 */
+/* .comment-item + .comment-item { margin-top: 12px; } */
+
+.comment-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment-author .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.comment-author .name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 24px;
+}
+
+.comment-author .time {
+    font-size: 12px;
+    color: var(--text);
+}
+
+.comment-body {
+    font-size: 14px;
+    color: var(--text);
+    margin-left: 46px;
+    /*line-height:*/
+}
