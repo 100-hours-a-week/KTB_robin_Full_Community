@@ -12,11 +12,15 @@ const invalidPasswordMessage = "*비밀번호는 8자 이상, 20자 이하이며
 const invalidEmailOrPasswordMessage = "*올바른 이메일 혹은 비밀번호가 아닙니다.";
 const loginFailedThenRetryMessage = "*로그인에 실패했습니다. 잠시 후 다시 시도해주세요.";
 
+const cssVars = getComputedStyle(document.documentElement);
+const COLOR_DEFAULT = cssVars.getPropertyValue("--primary").trim();
+const COLOR_ACTIVE = cssVars.getPropertyValue("--primary-hover").trim();
+
 
 let redirectTimer = null;
 
 clearHelper();
-setButtonBusy(false);
+setButtonColor(COLOR_DEFAULT);
 
 loginBtn.addEventListener("click", onSubmit);
 emailEl.addEventListener("input", onTyping);
@@ -55,22 +59,28 @@ async function onSubmit() {
     }
 
     clearHelper();
-    setButtonBusy(true);
+    setButtonColor(COLOR_ACTIVE);
+    redirectTimer = callLoginApi(email, pwd);
+}
 
-    try {
-        await login({ email, password: pwd });
-        window.location.href = "postList.html";
-    } catch (e) {
-        const msg = e?.message;
-        if (msg === "invalid_email_or_password") {
-            showHelper(invalidEmailOrPasswordMessage);
-        } else {
-            showHelper(loginFailedThenRetryMessage);
+function callLoginApi(email, pwd) {
+    return setTimeout(async () => {
+        try {
+            await login({ email, password: pwd });
+            setButtonColor(COLOR_DEFAULT);
+            window.location.href = "postList.html";
+        } catch (e) {
+            const msg = e?.message;
+            if (msg === "invalid_email_or_password") {
+                showHelper(invalidEmailOrPasswordMessage);
+            } else {
+                showHelper(loginFailedThenRetryMessage);
+            }
+            setButtonColor(COLOR_DEFAULT);
+        } finally {
+            redirectTimer = null;
         }
-    } finally {
-        setButtonBusy(false);
-    }
-
+    }, 3000);
 }
 
 function onTyping() {
@@ -78,7 +88,7 @@ function onTyping() {
     if (redirectTimer) {
         clearTimeout(redirectTimer);
         redirectTimer = null;
-        setButtonBusy(false);
+        setButtonColor(COLOR_DEFAULT);
     }
 }
 
@@ -94,7 +104,7 @@ function clearHelper() {
     helperEl.classList.add("is-hidden");
 }
 
-function setButtonBusy(busy) {
-    loginBtn.disabled = !!busy; // '!!' : 값을 명확하게 boolean 으로 변환하기
-    loginBtn.classList.toggle("is-busy", !!busy);
+function setButtonColor(color) {
+    loginBtn.style.backgroundColor = color;
+    loginBtn.style.borderColor = color;
 }
