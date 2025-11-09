@@ -366,3 +366,106 @@ button, input, textarea, select {
 }
 
 /* 헤더 타이틀은 브랜드 폰트 유지 */
+
+/* ===== Modal (Reusable) ===== */
+/* 오버레이: 가운데 정렬 + 반투명 배경 */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none; /* 기본은 숨김 */
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1000;
+}
+.modal.is-open {
+    display: flex;
+}
+
+/* 다이얼로그(바깥 박스) — width:408, height:242, r:12, bg:#fff */
+.modal__dialog {
+    width: 408px;
+    height: 242px;
+    border-radius: 12px;
+    background: #fff;
+    position: relative;
+    /* 시각적 선명도 보강 */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 타이틀 — top:48, 좌우:70, h:29, 중앙정렬, Bold 24 */
+.modal__title {
+    margin: 48px 70px 0 70px; /* top=48, 좌우=70 */
+    height: 29px;            /* 시안 높이 */
+    text-align: center;
+    font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0;
+    color: #000;
+}
+
+/* 서브 메시지 — top:101(= 타이틀 하단 24px 간격), 좌우:68, h:24, 중앙정렬, Bold 24 */
+.modal__message {
+    margin: 24px 68px 0 68px; /* 타이틀과의 간격 24px */
+    height: 24px;
+    text-align: center;
+    font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0;
+    color: #000;
+    word-break: keep-all;
+}
+
+/* 액션 영역 — top:149(= 메시지 하단 24px 간격) */
+.modal__actions {
+    /* 타이틀(48+29) → 77, 메시지 높이 24 → 101, 버튼 top=149 → 간격 24 */
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-start; /* 좌측 기준으로 정확 좌표 배치 */
+    gap: 63px;                   /* 버튼 사이 간격: 63px */
+    padding: 0 123px 0 69px;     /* 좌:69, 우:123 → 좌표 정확히 맞춤 */
+}
+
+/* 모달 전용 버튼 스펙 (기본 .btn 위에 덮어쓰기) — w:127, h:44, r:12, 폰트 20/400 */
+.btn--modal {
+    width: 127px;
+    height: 44px;
+    border-radius: 12px;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 100%;
+    padding: 10px 0; /* 시안: 위아래 10px */
+}
+
+/* 취소 버튼 — 배경 #242424, 텍스트 흰색 */
+.btn--modal-cancel {
+    background: rgba(36, 36, 36, 1);
+    color: #fff;
+}
+
+/* 확인 버튼 — 배경 #C4A5FA(시안), 텍스트 검정 */
+.btn--modal-confirm {
+    background: rgba(196, 165, 250, 1);
+    color: #000;
+}
+
+/* 호버 상태(가벼운 피드백) */
+.btn--modal:hover {
+    opacity: 0.92;
+}
+.btn--modal:active {
+    opacity: 0.88;
+}
+
+/* 키보드 포커스 접근성 */
+.modal__dialog:focus {
+    outline: none;
+}
+.modal__dialog:focus-visible {
+    outline: 2px solid rgba(0, 0, 0, 0.25);
+    outline-offset: 2px;
+}
