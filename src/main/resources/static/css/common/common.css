@@ -151,7 +151,9 @@ body.app-body {
 }
 
 .form {
-    width: 100%
+    margin-left: auto;
+    margin-right: auto;
+    width: 355px
 }
 
 .form-group {
@@ -168,7 +170,7 @@ body.app-body {
 }
 
 .input {
-    width: 100%;
+    width: 355px;
     height: 33px;
     padding: 8px 12px;
     border: 1px solid rgba(0, 0, 0, 1);
