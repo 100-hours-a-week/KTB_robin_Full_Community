@@ -37,7 +37,7 @@ passwordEl.addEventListener("input", onTyping);
 );
 
 
-async function onSubmit() {
+function onSubmit() {
     if (redirectTimer) return;
 
     const email = emailEl.value.trim();
