@@ -1,0 +1,161 @@
+.editor {
+    width: 100%;
+    max-width: 592px;
+    margin: 0 auto;
+}
+.editor-title {
+    width: 110px;
+    height: 31px;
+    margin: -96px auto 51px auto;
+    text-align: center;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 130%;
+    letter-spacing: 0;
+    color: #000;
+}
+
+.constrained-544 {
+    max-width: 544px;
+    width: calc(100% - 48px);
+    margin-left: 24px;
+    margin-right: auto;
+}
+
+.post-body {
+    background: transparent;
+    color: var(--text);
+    line-height: 141%;
+    font-size: 15px;
+}
+.editor-divider {
+    width: 592px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.editor-divider--tight {
+    width: 592px;
+    margin: 8px auto;
+}
+.editor-label {
+    width: auto;
+    height: 21px;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 130%;
+    letter-spacing: 0;
+    margin: 0 0 8px 24px;
+}
+
+.field-box {
+    width: 570px;
+    margin: 0 auto;
+    border: 1px solid #000;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+}
+
+.field-box--title {
+    height: 87px;
+}
+
+.field-box--content {
+    height: 263px;
+    border-width: 4px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    align-items: stretch;
+}
+.field-input--title {
+    width: 100%;
+    height: 23px;
+    border: none;
+    outline: none;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 141%;
+    letter-spacing: 0;
+    background: transparent;
+    margin-left: 24px;
+}
+.field-textarea {
+    width: 544px;
+    height: 231px;
+    margin-left: 24px;
+    resize: vertical;
+    border: none;
+    outline: none;
+    font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 141%;
+    letter-spacing: 0;
+    background: var(--bg);
+}
+.field-textarea::-webkit-resizer {
+    display: none;
+}
+
+.editor-helper {
+    font-size: 12px;
+    margin: 6px 0 16px 24px;
+    font-weight: 400
+}
+.file-row {
+    width: 544px;
+    margin-left: 24px;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.file-trigger {
+    width: 68px;
+    height: 29px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 1);
+    background: rgba(217, 217, 217, 1);
+    color: #000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+
+    font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0;
+    user-select: none;
+}
+.file-trigger:hover {
+    filter: brightness(0.98);
+}
+.file-trigger:active {
+    filter: brightness(0.96);
+}
+.file-trigger:focus-visible {
+    outline: 2px solid rgba(0,0,0,.25);
+    outline-offset: 2px;
+}
+
+.file-message {
+    font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0;
+    color: #000;
+    white-space: nowrap;
+    max-width: calc(100% - 88px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
