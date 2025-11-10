@@ -223,7 +223,8 @@ body.app-body {
 .helper {
     font-size: 12px;
     margin: 6px 0 16px 2px;
-    font-weight: 400
+    font-weight: 400;
+    font-family: 'Inter';
 }
 
 .helper--error {
