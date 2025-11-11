@@ -14,8 +14,8 @@ spring:
         format_sql: true
 
 file:
-  profileDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/images/profile/
-  postDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/images/post/
+  profileDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/assets/images/profile/
+  postDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/assets/images/post/
 
 
 
