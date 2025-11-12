@@ -102,7 +102,7 @@ public interface PostApi {
                                     "has_next": true
                                 }
                             }
-                            """),
+                            """)
                     })
             )
     })

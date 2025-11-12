@@ -26,6 +26,7 @@ public interface AuthApi {
                             {
                                 "message" : "login_success",
                                 "data" : {
+                                     "profile_image_url": 1a3e8a9f-9d95-41eb-b076-485b113e24db여세요.PNG"
                                      "access_token": "eyJhbGciOi ...",
                                      "token_type": "Bearer",
                                      "access_expired_in": 3600,\s
@@ -95,7 +96,7 @@ public interface AuthApi {
                     })
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401", description = "invalid_email_or_password",
+                    responseCode = "401", description = "refresh_token_expired",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "리프레시 토큰이 만료되었습니다.", value = """
                             {
