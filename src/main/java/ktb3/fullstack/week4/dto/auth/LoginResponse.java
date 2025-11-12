@@ -8,6 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class LoginResponse {
 
+    @JsonProperty("profile_image_url")
+    private String profileImageUrl;
+
     @JsonProperty("access_token")
     private String accessToken;
 

@@ -17,6 +17,9 @@ public class PostDetailResponse {
     @JsonProperty("is_liked")
     private boolean isLiked;
 
+    @JsonProperty("is_owner")
+    private boolean isOwner;
+
     @JsonProperty("comments")
     private List<CommentInfo> comments;
 
@@ -25,10 +28,11 @@ public class PostDetailResponse {
     public static class PostInfo {
         private long id;
         private String title;
-        private long likes;
-        private long comments;
-        private long views;
+        private long likeCount;
+        private long commentCount;
+        private long viewCount;
         private String author;
+        private String authorProfileImageUrl;
 
         @JsonProperty("modified_at")
         private LocalDateTime modifiedAt;
@@ -49,6 +53,7 @@ public class PostDetailResponse {
         private long id;
         private String author;
         private String content;
+        private String authorProfileImageUrl;
 
         @JsonProperty("modified_at")
         private LocalDateTime modifiedAt;

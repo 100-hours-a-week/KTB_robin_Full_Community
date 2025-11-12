@@ -26,10 +26,11 @@ public class PostListResponse {
     public static class PostBriefInfo {
         private long id;
         private String title;
-        private long likes;
-        private long comments;
-        private long views;
+        private long likeCount;
+        private long commentCount;
+        private long viewCount;
         private String author;
+        private String authorProfileImageUrl;
 
         @JsonProperty("modified_at")
         private LocalDateTime modifiedAt;
