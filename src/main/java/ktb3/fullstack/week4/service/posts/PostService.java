@@ -4,7 +4,6 @@ import ktb3.fullstack.week4.common.error.codes.*;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.PostImage;
-import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.posts.PostView;
@@ -15,23 +14,19 @@ import ktb3.fullstack.week4.dto.posts.PostListResponse;
 import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
 import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.repository.images.PostImageRepository;
+import ktb3.fullstack.week4.repository.images.ProfileImageRepository;
 import ktb3.fullstack.week4.repository.likes.LikeRepository;
 import ktb3.fullstack.week4.repository.posts.PostRepository;
-import ktb3.fullstack.week4.repository.users.UserRepository;
 import ktb3.fullstack.week4.repository.posts.PostViewRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import ktb3.fullstack.week4.service.images.ImageDomainBuilder;
 import ktb3.fullstack.week4.service.images.PostImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,22 +42,19 @@ public class PostService {
     private final ErrorCheckServiceImpl errorCheckService;
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final PostViewRepository postViewRepository;
     private final PostImageRepository postImageRepository;
+    private final ProfileImageRepository profileImageRepository;
 
     private final PostDeleteFacade postDeleteFacade;
     private final PostImageService postImageService;
 
-    @Value("${file.postDir}")
-    private String folderPath;
 
     // 게시글 등록
     @Transactional
     public void uploadPost(long userId, PostUploadRequeset dto, MultipartFile image) {
-
         User user = errorCheckService.checkCanNotFoundUser(userId);
 
         Post post = postDomainBuilder.buildPost(dto, user);
@@ -74,7 +66,10 @@ public class PostService {
         if(image != null) {
             String postImageUrl = postImageService.makeImagePathString(image);
             postImageService.transferImageToLocalDirectory(image, postImageUrl);
-            PostImage postImage = imageDomainBuilder.buildPostImage(post, postImageUrl); // 대표사진 추가
+
+            String savedUrl = postImageUrl.split("static")[1];
+            PostImage postImage = imageDomainBuilder.buildPostImage(post, savedUrl);
+
             postImageRepository.save(postImage);
         }
     }
@@ -101,11 +96,11 @@ public class PostService {
 
             long likes = likeRepository.countByPostId(postId);
             long comments = commentRepository.countByPostId(postId);
-            long views = postViewRepository.countByPostId(postId);
+            long views = postViewRepository.viewCountByPostId(postId);
 
-            String author = userRepository.findById(post.getUser().getId())
-                    .map(User::getNickname)
-                    .orElseThrow(() -> new ApiException(UserError.CANNOT_FOUND_USER));
+            User author = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
+            String authorName = author.getNickname();
+            String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(author.getId()).getImageUrl();
 
             briefs.add(new PostListResponse.PostBriefInfo(
                     post.getId(),
@@ -113,7 +108,8 @@ public class PostService {
                     likes,
                     comments,
                     views,
-                    author,
+                    authorName,
+                    authorProfileImageUrl,
                     post.getModifiedAt()
             ));
         }
@@ -140,24 +136,28 @@ public class PostService {
 
         User authorEntity = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
         String author = authorEntity.getNickname();
+        String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(authorEntity.getId()).getImageUrl();
 
         // 숫자 정보
         long likes = likeRepository.countByPostId(postId);
         long commentsCount = commentRepository.countByPostId(postId);
-        long views = postViewRepository.countByPostId(postId);
+        long views = postViewRepository.viewCountByPostId(postId);
 
         // (사용자 - 현재 조회중인 게시물) 좋아요 누름 여부
         boolean isLiked = likeRepository.existsByPostIdAndUserIdAndIsLikedTrue(postId, userId);
+
+        boolean isOwner = post.getUser().getId() == userId;
 
         // 댓글 상세 목록 조회 + dto 매핑
         List<Comment> commentEntities = commentRepository.findAllByPostId(postId);
         List<PostDetailResponse.CommentInfo> comments = new ArrayList<>();
         for (Comment comment : commentEntities) {
-
+            String commentAuthorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(comment.getUser().getId()).getImageUrl();
             comments.add(new PostDetailResponse.CommentInfo(
                             comment.getId(),
-                            author,
+                            comment.getUser().getNickname(),
                             comment.getContent(),
+                            commentAuthorProfileImageUrl,
                             comment.getModifiedAt()
                     )
             );
@@ -185,47 +185,37 @@ public class PostService {
                 commentsCount,
                 views,
                 author,
+                authorProfileImageUrl,
                 post.getModifiedAt(),
                 primaryImageUrl,
                 restImageUrls,
                 post.getContent()
         );
 
-        return new PostDetailResponse(postInfo, isLiked, comments);
+        return new PostDetailResponse(postInfo, isLiked, isOwner, comments);
     }
 
-    // 게시글 수정
     @Transactional
     public void editPost(long userId, long postId, PostEditRequest dto, MultipartFile image) {
         errorCheckService.checkCanNotFoundUser(userId);
 
         Post post = errorCheckService.checkCanNotFoundPost(postId);
 
-        // 작성자 본인 여부 확인
         errorCheckService.checkCanNotEditOthersPost(userId, post.getUser().getId());
 
-        // 제목/본문 수정
         post.editPost(dto);
 
-        // 이미지 수정: primary 이미지 교체
         if (image != null && !image.isEmpty()) {
-            // 기존 대표 이미지 삭제
             postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId)
                     .ifPresent(SoftDeletetionEntity::deleteEntity);
 
-            // 2) 로컬 폴더에 새 이미지 파일 저장
-            String postImageUrl = folderPath + image.getOriginalFilename();
+            String postImageUrl = postImageService.makeImagePathString(image);
+            postImageService.transferImageToLocalDirectory(image, postImageUrl);
 
-            try {
-                image.transferTo(new File(postImageUrl));
-            } catch (IOException e) {
-                System.out.println("이미지 이동 중 문제 발생!");
-                log.info("이미지 이동 중 문제 발생!");
-            }
+            String savedUrl = postImageUrl.split("static")[1];
+            PostImage postImage = imageDomainBuilder.buildPostImage(post, savedUrl);
 
-            // 새 이미지 업로드
-            PostImage newPrimaryImage = imageDomainBuilder.buildPostImage(post, postImageUrl);
-            postImageRepository.save(newPrimaryImage);
+            postImageRepository.save(postImage);
         }
     }
 
