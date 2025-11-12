@@ -44,14 +44,10 @@ public class UserService {
         String hashedPassword = passwordHasher.hash(dto.getPassword());
         User user = userDomainBuilder.buildUser(hashedPassword, dto);
 
-        // 이미지 저장할 경로 생성
         String profileImageUrl = profileImageService.makeImagePathString(image);
-        // 로컬 폴더에 실제 이미지 저장
         profileImageService.transferImageToLocalDirectory(image, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(profileImageUrl);
-
-        profileImage.linkUser(user);
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, profileImageUrl);
 
         profileImageRepository.save(profileImage);
         userRepository.save(user);
@@ -94,7 +90,7 @@ public class UserService {
         // 로컬 폴더에 실제 이미지 저장
         profileImageService.transferImageToLocalDirectory(newProfileImage, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(profileImageUrl);
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, profileImageUrl);
 
         List<ProfileImage> profileImages = profileImageRepository.findAllByUserId(userId);
         if (!profileImages.isEmpty()) {
