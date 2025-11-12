@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @CommonErrorResponses
 public class AuthController implements AuthApi {
 
-    private static final String REFRESH_COOKIE_NAME = "refresh_token";
 
     private final AuthService authService;
 
