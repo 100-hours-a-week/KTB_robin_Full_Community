@@ -2,6 +2,7 @@ package ktb3.fullstack.week4.repository.likes;
 
 import ktb3.fullstack.week4.domain.likes.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,5 +25,9 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     // 해당 게시글의 사용자 좋아요 여부 확인
     boolean existsByPostIdAndUserIdAndIsLikedTrue(Long postId, Long userId);
 
+    @Query("select count(l) " +
+            "from Like l " +
+            "where l.post.id = :postId and l.isLiked = true"
+    )
     long countByPostId(Long postId);
 }
