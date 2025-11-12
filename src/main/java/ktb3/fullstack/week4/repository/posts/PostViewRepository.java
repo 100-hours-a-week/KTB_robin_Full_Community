@@ -2,6 +2,7 @@ package ktb3.fullstack.week4.repository.posts;
 
 import ktb3.fullstack.week4.domain.posts.PostView;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,6 +14,7 @@ public interface PostViewRepository extends JpaRepository<PostView, Long> {
 
     Optional<PostView> findById(Long id);
 
-    long countByPostId(Long postId);
+    @Query("select pv.viewCount from PostView pv where pv.post.id =:postId")
+    long viewCountByPostId(Long postId);
 
 }
