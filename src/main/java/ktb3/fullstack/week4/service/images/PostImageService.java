@@ -25,7 +25,6 @@ public class PostImageService implements ImageService {
 
     @Override
     public void transferImageToLocalDirectory(MultipartFile image, String postImageUrl) {
-        System.out.println("경로 = " + postImageUrl);
         try {
             image.transferTo(new File(postImageUrl));
         } catch (IOException e) {

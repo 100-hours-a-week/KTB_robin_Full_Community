@@ -26,7 +26,6 @@ public class ProfileImageService implements ImageService {
 
     @Override
     public void transferImageToLocalDirectory(MultipartFile image, String profileImageUrl) {
-        System.out.println("경로 = " + profileImageUrl);
         try {
             image.transferTo(new File(profileImageUrl));
         } catch (IOException e) {
