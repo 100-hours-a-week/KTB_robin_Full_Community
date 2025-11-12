@@ -36,4 +36,9 @@ public class WebConfig implements WebMvcConfigurer {
                 );
     }
 
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**")
+                .addResourceLocations("file:src/main/resources/templates/", "file:src/main/resources/static/");
+    }
 }
