@@ -13,6 +13,10 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
 file:
   profileDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/assets/images/profile/
   postDir: /Users/dragonwaterr/Desktop/week4/src/main/resources/static/assets/images/post/
