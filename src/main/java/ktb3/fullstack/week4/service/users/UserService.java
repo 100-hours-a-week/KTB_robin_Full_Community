@@ -47,7 +47,8 @@ public class UserService {
         String profileImageUrl = profileImageService.makeImagePathString(image);
         profileImageService.transferImageToLocalDirectory(image, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, profileImageUrl);
+        String saved = profileImageUrl.split("static")[1];
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, saved);
 
         profileImageRepository.save(profileImage);
         userRepository.save(user);
