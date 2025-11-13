@@ -1,7 +1,6 @@
 package ktb3.fullstack.week4.service.users;
 
 import ktb3.fullstack.week4.domain.comments.Comment;
-import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.likes.Like;
 import ktb3.fullstack.week4.domain.posts.Post;

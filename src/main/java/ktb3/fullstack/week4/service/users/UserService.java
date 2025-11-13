@@ -36,9 +36,6 @@ public class UserService {
     private final UserDeleteFacade userDeleteFacade;
 
 
-
-
-
     @Transactional
     public void register(JoinRequest dto, MultipartFile image) {
         String hashedPassword = passwordHasher.hash(dto.getPassword());
@@ -85,13 +82,11 @@ public class UserService {
     public String changeProfileImage(long userId, MultipartFile newProfileImage) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
 
-        // 이미지 저장할 경로 생성
         String profileImageUrl = profileImageService.makeImagePathString(newProfileImage);
-
-        // 로컬 폴더에 실제 이미지 저장
         profileImageService.transferImageToLocalDirectory(newProfileImage, profileImageUrl);
 
-        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, profileImageUrl);
+        String saved = profileImageUrl.split("static")[1];
+        ProfileImage profileImage = imageDomainBuilder.buildProfileImage(user, saved);
 
         List<ProfileImage> profileImages = profileImageRepository.findAllByUserId(userId);
         if (!profileImages.isEmpty()) {
@@ -105,7 +100,7 @@ public class UserService {
 
         profileImage.linkUser(user); // 연관관계 편의 메소드
         profileImageRepository.save(profileImage); // 더티체킹
-        return profileImageUrl;
+        return saved;
     }
 
     // 프로필 이미지 삭제
