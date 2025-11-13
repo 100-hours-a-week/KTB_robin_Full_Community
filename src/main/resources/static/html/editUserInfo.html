@@ -12,14 +12,6 @@
 <header class="app-header">
     <h1 class="app-title">
         아무 말 대잔치
-        <a href="profile.html" class="app-profile" aria-label="내 프로필">
-            <span class="app-profile__avatar" aria-hidden="true"></span>
-        </a>
-        <nav id="profileMenu" class="profile-menu" aria-label="프로필 메뉴" aria-hidden="true" role="menu">
-            <a class="profile-menu__item" href="editUserInfo.html" role="menuitem" tabindex="-1">회원정보수정</a>
-            <a class="profile-menu__item" href="editPassword.html" role="menuitem" tabindex="-1">비밀번호수정</a>
-            <a class="profile-menu__item" href="login.html" role="menuitem" tabindex="-1">로그아웃</a>
-        </nav>
     </h1>
 </header>
 
@@ -32,8 +24,8 @@
                 <span class="avatar-title">프로필 사진*</span>
             </div>
 
-            <input type="file" id="profileImage" class="visually-hidden" accept="image/*"/>
-            <label for="profileImage" class="avatar-trigger" aria-label="프로필 사진 변경">
+        <input type="file" id="profileImage" class="visually-hidden" accept="image/*"/>
+            <label for="profileImage" id="avatar-trigger" class="avatar-trigger" aria-label="프로필 사진 변경">
                 <span class="avatar-trigger__badge" aria-hidden="true">변경</span>
             </label>
         </div>
@@ -66,16 +58,14 @@
                 </p>
             </div>
 
-            <button type="button" id="btnUpdateProfile" class="btn btn--block">수정하기</button>
+            <button type="button" id="btnUpdateProfile" class="btn btn--block btn:disabled">수정하기</button>
             <div class="editUserInfo__more">
                 <button type="button" id="btnLeave" class="btn--link">회원 탈퇴</button>
             </div>
         </form>
-
-        <div class="editUserInfo__footer">
-            <button type="button" id="btnDone" class="btn--pill">수정완료</button>
-        </div>
     </section>
 </main>
+<script type="module" src="../js/core/profileHeader.js"></script>
+<script type="module" src="../js/pages/editUserInfo.js"></script>
 </body>
 </html>

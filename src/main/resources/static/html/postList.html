@@ -12,9 +12,6 @@
 <header class="app-header">
     <h1 class="app-title">
         아무 말 대잔치
-        <a href="profile.html" class="app-profile" aria-label="내 프로필">
-            <span class="app-profile__avatar" aria-hidden="true"></span>
-        </a>
     </h1>
 </header>
 
@@ -27,119 +24,41 @@
     </div>
   </section>
 
-  <!-- 게시글 카드 리스트 -->
   <section class="feed-list" aria-label="게시글 목록">
       <div class="write-toolbar">
-          <a href="postCreate.html" class="btn btn--primary write-btn">게시글 작성</a>
+          <a href="postWrite.html" class="btn btn--primary write-btn">게시글 작성</a>
       </div>
 
-    <!-- 카드 1 -->
-    <article class="post-card">
-      <header class="post-head">
-        <h2 class="post-title">제목 1</h2>
-        <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-      </header>
-      <div class="post-meta">
-        <span>좋아요 0</span>
-        <span>댓글 0</span>
-        <span>조회수 0</span>
-      </div>
-      <hr class="post-divider" />
-      <footer class="post-foot">
-        <div class="author">
-          <span class="author-avatar" aria-hidden="true"></span>
-          <span class="author-name">더미 작성자 1</span>
-        </div>
-      </footer>
-    </article>
-
-    <!-- 더미 카드 2 -->
-    <article class="post-card">
-      <header class="post-head">
-        <h2 class="post-title">제목 1</h2>
-        <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-      </header>
-      <div class="post-meta">
-        <span>좋아요 0</span>
-        <span>댓글 0</span>
-        <span>조회수 0</span>
-      </div>
-      <hr class="post-divider" />
-      <footer class="post-foot">
-        <div class="author">
-          <span class="author-avatar" aria-hidden="true"></span>
-          <span class="author-name">더미 작성자 1</span>
-        </div>
-      </footer>
-    </article>
-
-    <!-- 더미 카드 3 -->
-    <article class="post-card">
-      <header class="post-head">
-        <h2 class="post-title">제목 1</h2>
-        <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-      </header>
-      <div class="post-meta">
-        <span>좋아요 0</span>
-        <span>댓글 0</span>
-        <span>조회수 0</span>
-      </div>
-      <hr class="post-divider" />
-      <footer class="post-foot">
-        <div class="author">
-          <span class="author-avatar" aria-hidden="true"></span>
-          <span class="author-name">더미 작성자 1</span>
-        </div>
-      </footer>
-    </article>
-
-    <!-- 더미 카드 4 -->
-    <article class="post-card">
-      <header class="post-head">
-        <h2 class="post-title">제목 1</h2>
-        <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-      </header>
-      <div class="post-meta">
-        <span>좋아요 0</span>
-        <span>댓글 0</span>
-        <span>조회수 0</span>
-      </div>
-      <hr class="post-divider" />
-      <footer class="post-foot">
-        <div class="author">
-          <span class="author-avatar" aria-hidden="true"></span>
-          <span class="author-name">더미 작성자 1</span>
-        </div>
-      </footer>
-    </article>
-
-    <!-- 더미 카드 5 -->
-    <article class="post-card">
-      <header class="post-head">
-        <h2 class="post-title">제목 1</h2>
-        <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-      </header>
-      <div class="post-meta">
-        <span>좋아요 0</span>
-        <span>댓글 0</span>
-        <span>조회수 0</span>
-      </div>
-      <hr class="post-divider" />
-      <footer class="post-foot">
-        <div class="author">
-          <span class="author-avatar" aria-hidden="true"></span>
-          <span class="author-name">더미 작성자 1</span>
-        </div>
-      </footer>
-    </article>
+      <template id="post-card-template">
+        <article class="post-card" role="article" tabindex="0">
+          <header class="post-head">
+            <h2 class="post-title"></h2>
+            <time class="post-time" datetime=""></time>
+          </header>
+          <div class="post-meta">
+            <span class="post-like"></span>
+            <span class="post-comment"></span>
+            <span class="post-view"></span>
+          </div>
+          <hr class="post-divider" />
+          <footer class="post-foot">
+            <div class="author">
+              <span class="author-avatar avatar avatar--md" aria-hidden="true"></span>
+              <span class="author-name"></span>
+            </div>
+          </footer>
+        </article>
+      </template>
   </section>
 
-  <!-- 무한스크롤 로더/센티널 (추후 JS 연결용) -->
   <div class="feed-loader" role="status" aria-live="polite">
     <span class="spinner" aria-hidden="true"></span>
     <span class="loader-text">더 불러오는 중...</span>
   </div>
   <div id="infinite-scroll-sentinel" aria-hidden="true"></div>
 </main>
+
+<script type="module" src="../js/core/profileHeader.js"></script>
+<script type="module" src="../js/pages/postList.js"></script>
 </body>
 </html>

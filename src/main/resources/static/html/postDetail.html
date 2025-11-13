@@ -15,69 +15,64 @@
             <span class="app-back__icon" aria-hidden="true">‹</span>
         </a>
         아무 말 대잔치
-        <a href="profile.html" class="app-profile" aria-label="내 프로필">
-            <span class="app-profile__avatar" aria-hidden="true"></span>
-        </a>
     </h1>
 </header>
 
 <main class="post">
-    <article class="post-card">
+    <article class="post-card" id="postContainer" hidden>
         <header class="post-head constrained-544">
             <div class="post-title-wrap">
-                <h2 class="post-title">제목 1</h2>
+                <h2 class="post-title"></h2>
                 <div class="post-meta">
                     <span class="author">
-                        <span class="author-avatar" aria-hidden="true"></span>
-                        <span class="author-name">더미 작성자 1</span>
+                        <span class="author-avatar avatar avatar--md" aria-hidden="true"></span>
+                        <strong class="post-author"></strong>
                     </span>
-                    <time class="post-time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
+                    <time class="post-time" datetime=""></time>
                 </div>
             </div>
 
             <div class="post-actions" role="group" aria-label="게시글 작업">
-                <button type="button" class="btn--ghost" data-action="edit">수정</button>
-                <button type="button" class="btn--ghost" data-action="delete">삭제</button>
+                <button type="button" class="btn--ghost" id="postEditBtn" data-action="edit" hidden>수정</button>
+                <button type="button" class="btn--ghost" id="postDeleteBtn" data-action="delete" hidden>삭제</button>
             </div>
         </header>
 
-        <!-- 요구사항 #5: 헤더와 이미지 사이 구분선 -->
         <hr class="divider"/>
 
         <figure class="post-media" aria-label="게시글 이미지">
             <div class="media-placeholder" aria-hidden="true"></div>
+            <img id="postImage" class="post-image" alt="게시글 이미지" hidden />
         </figure>
 
         <section class="post-body constrained-544">
-            <p>
-                무엇을 얘기할까요? 아무얘기여러분, 쉬운 한마디 놀라운 이야기라고 생각합니다. 우리는 매일 새로운 경험을 통해 성장하고 배우습니다...
-            </p>
+            <p></p>
         </section>
 
         <section class="post-stats" aria-label="게시글 통계">
             <div class="stat">
-                <strong class="stat-num" data-like-count>123</strong>
+                <strong class="stat-num" id="likeCount">0</strong>
                 <span class="stat-label">좋아요수</span>
             </div>
             <div class="stat">
-                <strong class="stat-num" data-view-count>123</strong>
+                <strong class="stat-num" id="viewCount">0</strong>
                 <span class="stat-label">조회수</span>
             </div>
             <div class="stat">
-                <strong class="stat-num" data-comment-count>123</strong>
+                <strong class="stat-num" id="commentCount">0</strong>
                 <span class="stat-label">댓글</span>
             </div>
         </section>
 
         <hr class="divider"/>
 
-        <!-- [4] 댓글 작성 영역 -->
+        <!-- 댓글 작성 -->
         <section class="comment-write" aria-label="댓글 작성">
             <div class="comment-write__box">
                 <div class="comment-write__editor">
-                    <label for="commentInput" class="visually-hidden">댓글 입력</label>
+                    <label for="comment" class="visually-hidden">댓글 입력</label>
                     <textarea
-                            id="commentInput"
+                            id="comment"
                             class="comment-textarea"
                             placeholder="댓글을 남겨주세요!"
                             rows="4"
@@ -85,53 +80,16 @@
                 </div>
                 <hr class="comment-write__divider"/>
                 <div class="comment-write__actions">
-                    <button type="button" class="btn btn--primary" data-action="comment-submit">댓글 등록</button>
+                    <button type="button" id="commentSubmitBtn" class="btn btn--primary btn-primary--disabled" data-action="comment-submit" disabled>댓글 등록</button>
                 </div>
             </div>
         </section>
 
-        <!-- 댓글 리스트 -->
-        <section class="comment-list" aria-label="댓글 목록">
-            <!-- 댓글 아이템 예시 -->
-            <article class="comment-item">
-                <header class="comment-head">
-                    <div class="comment-author">
-                        <span class="author-avatar" aria-hidden="true"></span>
-                        <strong class="name">더미 작성자 1</strong>
-                        <time class="time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-                    </div>
-                    <!-- [5] 댓글 수정/삭제 -->
-                    <div class="comment-actions" role="group" aria-label="댓글 작업">
-                        <button type="button" class="btn--ghost" data-action="comment-edit">수정</button>
-                        <button type="button" class="btn--ghost" data-action="comment-delete">삭제
-                        </button>
-                    </div>
-                </header>
-                <div class="comment-body">
-                    댓글 내용
-                </div>
-            </article>
-
-            <!-- 필요 시 반복 렌더링 -->
-            <article class="comment-item">
-                <header class="comment-head">
-                    <div class="comment-author">
-                        <span class="author-avatar" aria-hidden="true"></span>
-                        <strong class="name">더미 작성자 1</strong>
-                        <time class="time" datetime="2021-01-01T00:00:00">2021-01-01 00:00:00</time>
-                    </div>
-                    <div class="comment-actions" role="group" aria-label="댓글 작업">
-                        <button type="button" class="btn--ghost" data-action="comment-edit">수정</button>
-                        <button type="button" class="btn--ghost" data-action="comment-delete">삭제
-                        </button>
-                    </div>
-                </header>
-                <div class="comment-body">
-                    댓글 내용
-                </div>
-            </article>
-        </section>
+        <!-- 댓글 리스트: 초기 더미 제거 -->
+        <section class="comment-list" aria-label="댓글 목록"></section>
     </article>
 </main>
+<script type="module" src="../js/core/profileHeader.js"></script>
+<script type="module" src="../js/pages/postDetail.js"></script>
 </body>
 </html>
