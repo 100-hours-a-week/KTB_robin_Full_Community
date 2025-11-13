@@ -216,6 +216,7 @@ public class PostService {
             PostImage postImage = imageDomainBuilder.buildPostImage(post, savedUrl);
 
             postImageRepository.save(postImage);
+            post.renewModifiedAt(postImage.getModifiedAt());
         }
     }
 

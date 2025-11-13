@@ -27,4 +27,8 @@ public abstract class BaseTimeEntity {
     @LastModifiedDate
     @Column(name = "modified_at")
     private LocalDateTime modifiedAt;
+
+    public void renewModifiedAt(LocalDateTime now) {
+        this.modifiedAt = now;
+    }
 }
