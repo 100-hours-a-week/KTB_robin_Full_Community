@@ -113,11 +113,7 @@
   align-items:center;
   gap: 10px;
 }
-.author-avatar{
-  width: 36px; height: 36px; border-radius: 50%;
-  background: #e5e7eb; border:1px solid #d4d4d8;
-  display:inline-block;
-}
+/* Avatar appearance unified via common.css .avatar utility */
 
 .author-name {
     color: #000000;

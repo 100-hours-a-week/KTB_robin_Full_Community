@@ -58,11 +58,6 @@
     clip-path: inset(50%);
 }
 
-/* 폼 간격 보정(로그인과 동일 리듬 유지) */
-.card--auth {
-    padding: 0 8px;
-}
-
 .card-title { /* 제목과 필드 사이 간격 */
     margin-top: 30%;
     margin-bottom: 12px;
@@ -70,7 +65,8 @@
 
 /* helper 텍스트와 다음 라벨 사이 4px 간격을 위해 간격 규칙 오버라이드 */
 .form .form-group {
-    margin-bottom: 0;          /* 공통의 하단 간격 제거 */
+    margin-bottom: 0;
+    margin-left: 25px/* 공통의 하단 간격 제거 */
 }
 
 /* helper 자체의 하단 간격 제거 */

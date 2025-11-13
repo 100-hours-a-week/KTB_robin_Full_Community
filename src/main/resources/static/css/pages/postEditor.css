@@ -6,7 +6,7 @@
 .editor-title {
     width: 110px;
     height: 31px;
-    margin: -96px auto 51px auto;
+    margin: auto auto 51px auto;
     text-align: center;
     font-family: var(--font-label);
     font-weight: 700;
@@ -103,11 +103,18 @@
     display: none;
 }
 
-.editor-helper {
+.editor-title-helper {
+    font-size: 12px;
+    margin: -20px 0 26px 24px;
+    font-weight: 400
+}
+
+.editor-body-helper {
     font-size: 12px;
     margin: 6px 0 16px 24px;
     font-weight: 400
 }
+
 .file-row {
     width: 544px;
     margin-left: 24px;

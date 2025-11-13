@@ -1,11 +1,15 @@
 /* login.css */
 /* 페이지 고유 보정(간격/높이 등). 필요 시 다른 화면은 개별 CSS 파일에서 최소 보정만 추가하세요. */
 
-.card--auth{ /* 스크린샷과 유사한 여백 깊이 */
-  padding-left:12px;
-  padding-right:12px;
+.card--auth { /* 스크린샷과 유사한 여백 깊이 */
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
-.card-title{ /* 제목과 필드 사이 간격 */
-  margin-bottom:32px;
+.card-title { /* 제목과 필드 사이 간격 */
+    margin-bottom: 32px;
+}
+
+.form-group {
+    margin-left: 25px;
 }
