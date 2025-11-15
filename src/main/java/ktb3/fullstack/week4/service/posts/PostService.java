@@ -83,11 +83,19 @@ public class PostService {
         int to = after + limit;
 
         List<Post> raw = postRepository.findAllByIdBetween((long) from, (long) to);
+        List<Post> next = postRepository.findAllByIdBetween((long) from + limit, (long) to + limit);
 
-        boolean hasNext = raw.size() > limit;
+        /*
+            Pageble로 변경 전 임시방편
+
+            edge case : postId가 from ~ to 범위인 게시글 모두 삭제된 게시글이라면 오류발생
+        */
+        boolean hasNext = !next.isEmpty();
+
+        System.out.println("hasNext = " + hasNext);
         List<Post> page = hasNext ? raw.subList(0, limit) : raw;
 
-        List<PostListResponse.PostBriefInfo> briefs = new ArrayList<>(page.size());
+        List<PostListResponse.PostBriefInfo> briefs =   new ArrayList<>(page.size());
 
 
         for (Post post : page) {
