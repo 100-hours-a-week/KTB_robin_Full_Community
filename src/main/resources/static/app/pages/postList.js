@@ -108,7 +108,6 @@ async function loadMore() {
         cursor = data?.next_cursor ?? cursor;
         hasNext = Boolean(data?.has_next);
     } catch (e) {
-        // 간단한 사용자 알림
         console.error(e);
     } finally {
         $loader.style.display = hasNext ? "flex" : "none";
@@ -116,13 +115,29 @@ async function loadMore() {
     }
 }
 
+// sentinel 이 화면 안에 있는 동안은 뷰포트가 꽉 찰 때까지 반복 로드
+async function fillUntilOverflow() {
+    // 이미 로딩 중이면 일단 끝날 때까지 기다림
+    while (!isLoading && hasNext) {
+        const rect = $sentinel.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        // sentinel 이 "화면 안 + 여유 50px" 이내에 있으면 계속 채운다
+        if (rect.top <= viewportHeight + 50) {
+            await loadMore();
+        } else {
+            break;
+        }
+    }
+}
+
 function setupInfiniteScroll() {
     const io = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    loadMore();
-                }
+                if (!entry.isIntersecting) return;
+                // sentinel 이 보이면, 화면이 꽉 찰 때까지 로딩
+                fillUntilOverflow();
             });
         },
         {rootMargin: "50px"}
