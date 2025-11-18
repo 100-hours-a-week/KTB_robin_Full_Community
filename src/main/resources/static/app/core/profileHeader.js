@@ -15,6 +15,7 @@ import {logout, refresh} from "../features/auth/api.js";
         const profileBtn = document.createElement("button");
         profileBtn.type = "button";
         profileBtn.className = "app-profile";
+        profileBtn.dataset.state = "closed";
         profileBtn.setAttribute("aria-label", "내 프로필 메뉴 열기");
         profileBtn.setAttribute("aria-haspopup", "menu");
         profileBtn.setAttribute("aria-expanded", "false");
@@ -23,6 +24,11 @@ import {logout, refresh} from "../features/auth/api.js";
         avatar.className = "app-profile__avatar";
         avatar.setAttribute("aria-hidden", "true");
         profileBtn.appendChild(avatar);
+
+        const label = document.createElement("span");
+        label.className = "app-profile__label";
+        label.textContent = "PROFILE";
+        profileBtn.appendChild(label);
 
         try {
             const storedUrl = localStorage.getItem("profile_image_url");
@@ -108,6 +114,7 @@ import {logout, refresh} from "../features/auth/api.js";
             menu.classList.add("is-open");
             menu.setAttribute("aria-hidden", "false");
             profileBtn.setAttribute("aria-expanded", "true");
+            profileBtn.dataset.state = "open";
             document.addEventListener("click", handleOutside, {capture: true});
             document.addEventListener("keydown", handleKey);
         }
@@ -116,6 +123,7 @@ import {logout, refresh} from "../features/auth/api.js";
             menu.classList.remove("is-open");
             menu.setAttribute("aria-hidden", "true");
             profileBtn.setAttribute("aria-expanded", "false");
+            profileBtn.dataset.state = "closed";
             document.removeEventListener("click", handleOutside, {capture: true});
             document.removeEventListener("keydown", handleKey);
         }

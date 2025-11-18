@@ -18,41 +18,44 @@
     </h1>
 </header>
 
-<main class="post">
-    <article class="post-card" id="postContainer" hidden>
-        <header class="post-head constrained-544">
-            <div class="post-title-wrap">
-                <h2 class="post-title"></h2>
-                <div class="post-meta">
-                    <span class="author">
-                        <span class="author-avatar avatar avatar--md" aria-hidden="true"></span>
-                        <strong class="post-author"></strong>
-                    </span>
-                    <time class="post-time" datetime=""></time>
+<main class="app-main post">
+    <article class="post-shell" id="postContainer" hidden>
+        <header class="post-hero">
+            <p class="post-kicker">MESSAGE LOG</p>
+            <div class="post-hero__top">
+                <div class="post-title-wrap">
+                    <h2 class="post-title"></h2>
+                    <div class="post-meta">
+                        <span class="author">
+                            <span class="author-avatar avatar avatar--md" aria-hidden="true"></span>
+                            <strong class="post-author"></strong>
+                        </span>
+                        <time class="post-time" datetime=""></time>
+                    </div>
+                </div>
+                <div class="post-actions" role="group" aria-label="게시글 작업">
+                    <button type="button" class="btn btn--ghost" id="postEditBtn" data-action="edit" hidden>수정</button>
+                    <button type="button" class="btn btn--ghost" id="postDeleteBtn" data-action="delete" hidden>삭제</button>
                 </div>
             </div>
-
-            <div class="post-actions" role="group" aria-label="게시글 작업">
-                <button type="button" class="btn--ghost" id="postEditBtn" data-action="edit" hidden>수정</button>
-                <button type="button" class="btn--ghost" id="postDeleteBtn" data-action="delete" hidden>삭제</button>
+            <div class="post-tags">
+                <span class="post-tag">field note</span>
+                <span class="post-tag post-tag--dark">live feed</span>
+                <span class="post-tag">ver. 1.0</span>
             </div>
         </header>
-
-        <hr class="divider"/>
 
         <figure class="post-media" aria-label="게시글 이미지">
             <div class="media-placeholder" aria-hidden="true"></div>
             <img id="postImage" class="post-image" alt="게시글 이미지" hidden />
         </figure>
 
-        <section class="post-body constrained-544">
-            <p></p>
-        </section>
+        <section class="post-body"></section>
 
         <section class="post-stats" aria-label="게시글 통계">
-            <div class="stat">
+            <div class="stat stat--interactive" role="button" tabindex="0" aria-pressed="false">
                 <strong class="stat-num" id="likeCount">0</strong>
-                <span class="stat-label">좋아요수</span>
+                <span class="stat-label">좋아요</span>
             </div>
             <div class="stat">
                 <strong class="stat-num" id="viewCount">0</strong>
@@ -64,9 +67,6 @@
             </div>
         </section>
 
-        <hr class="divider"/>
-
-        <!-- 댓글 작성 -->
         <section class="comment-write" aria-label="댓글 작성">
             <div class="comment-write__box">
                 <div class="comment-write__editor">
@@ -78,14 +78,12 @@
                             rows="4"
                     ></textarea>
                 </div>
-                <hr class="comment-write__divider"/>
                 <div class="comment-write__actions">
                     <button type="button" id="commentSubmitBtn" class="btn btn--primary btn-primary--disabled" data-action="comment-submit" disabled>댓글 등록</button>
                 </div>
             </div>
         </section>
 
-        <!-- 댓글 리스트: 초기 더미 제거 -->
         <section class="comment-list" aria-label="댓글 목록"></section>
     </article>
 </main>

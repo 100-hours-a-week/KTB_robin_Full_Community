@@ -168,8 +168,8 @@ function ensureCommentTemplate() {
           <span class="author-avatar avatar avatar--md" aria-hidden="true"></span>
           <div class="meta">
             <strong class="name"></strong>
+            <time class="time" datetime=""></time>
           </div>
-          <time class="time" datetime=""></time>
         </div>
         <div class="comment-actions">
           <button type="button" class="btn--ghost btn-edit" hidden>수정</button>

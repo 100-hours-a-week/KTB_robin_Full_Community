@@ -19,47 +19,56 @@
 </header>
 
 <main class="app-main">
-    <section class="editor">
-        <h2 class="editor-title constrained-544" aria-level="2">게시글 수정</h2>
+    <section class="editor-panel" aria-labelledby="editorTitle">
+        <header class="editor-hero">
+            <p class="editor-kicker">POST CONTROL ROOM</p>
+            <h2 class="editor-title" id="editorTitle">게시글 수정</h2>
+            <p class="editor-description">
+                이미 방송된 문장을 손보고 있습니다. 문맥을 지키면서도 더 정확한 신호를 올려주세요.
+                수정이 완료되면 자동으로 상세 페이지에서 반영됩니다.
+            </p>
+            <div class="editor-meta">
+                <span class="editor-meta__item">MODE: EDIT</span>
+                <span class="editor-meta__item editor-meta__item--accent">DOC STATUS: ACTIVE</span>
+            </div>
+        </header>
 
-        <form class="form edit-form" action="#" method="post" enctype="multipart/form-data" novalidate>
-            <div class="form-group">
-                <label for="title" class="label editor-label constrained-544">제목*</label>
-
-                <hr class="divider editor-divider"/>
+        <form class="form edit-form editor-form" action="#" method="post" enctype="multipart/form-data" novalidate>
+            <div class="editor-field">
+                <div class="editor-field__header">
+                    <label for="title" class="label editor-label">제목*</label>
+                    <span class="editor-field__badge">필수</span>
+                </div>
 
                 <div class="field-line">
                     <input id="title"
                            name="title"
                            type="text"
-                           class="field-input field-input--title constrained-544"
+                           class="field-input field-input--title"
                            placeholder="제목을 입력해주세요."/>
                 </div>
+                <p class="helper helper--error editor-title-helper" aria-live="polite">&nbsp;</p>
             </div>
 
-            <hr class="divider editor-divider"/>
-            <p class="helper helper--error editor-title-helper constrained-544">* helper text</p>
-
-            <div class="form-group">
-                <label for="content" class="label editor-label constrained-544">내용*</label>
-                <hr class="divider editor-divider"/>
-
-                <div class="post-body" aria-live="polite">
+            <div class="editor-field">
+                <div class="editor-field__header">
+                    <label for="content" class="label editor-label">내용*</label>
+                    <span class="editor-field__badge">필수</span>
+                </div>
+                <div class="field-line field-line--textarea">
                     <textarea id="content"
                               name="content"
-                              class="field-textarea constrained-544"
-                              placeholder="내용을 입력해주세요.">
-
-                    </textarea>
+                              class="field-textarea"
+                              placeholder="내용을 입력해주세요."></textarea>
                 </div>
-
-                <hr class="divider editor-divider--tight"/>
-                <p class="helper helper--error editor-body-helper constrained-544">* helper text</p>
+                <p class="helper helper--error editor-body-helper" aria-live="polite">&nbsp;</p>
             </div>
 
-
-            <div class="form-group">
-                <span class="label editor-label constrained-544">이미지</span>
+            <div class="editor-field editor-field--file">
+                <div class="editor-field__header">
+                    <span class="label editor-label">이미지</span>
+                    <span class="editor-field__badge">선택</span>
+                </div>
 
                 <div class="file-row">
                     <input type="file" id="image" name="image" accept="image/*" class="visually-hidden"/>
@@ -68,7 +77,9 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn--block">수정하기</button>
+            <div class="editor-actions">
+                <button type="submit" class="btn btn--block">수정하기</button>
+            </div>
         </form>
     </section>
 </main>
