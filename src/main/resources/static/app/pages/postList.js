@@ -38,6 +38,9 @@ function createPostCard(post) {
     const {id, title, likeCount, commentCount, viewCount, author, authorProfileImageUrl, modified_at} = post;
     const $article = $template.content.firstElementChild.cloneNode(true);
 
+    // 카드 식별용 데이터 속성 (이벤트 위임에서 사용)
+    $article.dataset.postId = id;
+
     // 제목(26자 제한)
     $article.querySelector(".post-title").textContent = truncate(title, 26);
 
@@ -60,19 +63,36 @@ function createPostCard(post) {
         setAvatar($avatar, authorProfileImageUrl, author);
     }
 
-    // 카드 전체 클릭 시 상세로 이동
-    const goDetail = () => {
-        window.location.href = `postDetail.html?id=${id}`;
+    return $article;
+}
+
+// 리스트에 한 번만 이벤트를 달아서 카드 클릭/키보드 이벤트를 처리
+function attachEventToList() {
+    if (!$list) return;
+
+    const goDetail = (postId) => {
+        if (!postId) return;
+        window.location.href = `postDetail.html?id=${postId}`;
     };
-    $article.addEventListener("click", goDetail);
-    $article.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            goDetail();
-        }
+
+    $list.addEventListener("click", (e) => {
+        const card = e.target.closest("[data-post-id]");
+        if (!card || !$list.contains(card)) return;
+
+        const {postId} = card.dataset;
+        goDetail(postId);
     });
 
-    return $article;
+    $list.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+
+        const card = e.target.closest("[data-post-id]");
+        if (!card || !$list.contains(card)) return;
+
+        e.preventDefault();
+        const {postId} = card.dataset;
+        goDetail(postId);
+    });
 }
 
 async function loadMore() {
@@ -96,11 +116,6 @@ async function loadMore() {
     }
 }
 
-function clearDummyCards() {
-    // 템플릿과 작성 버튼을 제외한 기존 카드 제거
-    $list.querySelectorAll(".post-card").forEach((el) => el.remove());
-}
-
 function setupInfiniteScroll() {
     const io = new IntersectionObserver(
         (entries) => {
@@ -108,10 +123,9 @@ function setupInfiniteScroll() {
                 if (entry.isIntersecting) {
                     loadMore();
                 }
-                // hasNext = false -> loader 를 끄는 작업이 필요할듯
             });
         },
-        {rootMargin: "50px 0px"}
+        {rootMargin: "50px"}
     );
     io.observe($sentinel);
 }
@@ -119,7 +133,7 @@ function setupInfiniteScroll() {
 // 초기화
 (function init() {
     if (!$list || !$loader || !$sentinel || !$template) return;
-    clearDummyCards();
     setupInfiniteScroll();
     loadMore(); // 첫 페이지 로드
+    attachEventToList();
 })();
