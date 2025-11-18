@@ -112,21 +112,14 @@ async function loadMore() {
     } finally {
         $loader.style.display = hasNext ? "flex" : "none";
         isLoading = false;
-    }
-}
 
-// sentinel 이 화면 안에 있는 동안은 뷰포트가 꽉 찰 때까지 반복 로드
-async function fillUntilOverflow() {
-    // 이미 로딩 중이면 일단 끝날 때까지 기다림
-    while (!isLoading && hasNext) {
-        const rect = $sentinel.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        if (hasNext && $sentinel) {
+            const rect = $sentinel.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
 
-        // sentinel 이 "화면 안 + 여유 50px" 이내에 있으면 계속 채운다
-        if (rect.top <= viewportHeight + 50) {
-            await loadMore();
-        } else {
-            break;
+            if (rect.top <= vh + 50) {
+                loadMore();
+            }
         }
     }
 }
@@ -136,11 +129,15 @@ function setupInfiniteScroll() {
         (entries) => {
             entries.forEach((entry) => {
                 if (!entry.isIntersecting) return;
-                // sentinel 이 보이면, 화면이 꽉 찰 때까지 로딩
-                fillUntilOverflow();
+                if (!hasNext || isLoading) return;
+
+                loadMore();
             });
         },
-        {rootMargin: "50px"}
+        {
+            rootMargin: "50px",
+            threshold: 0
+        }
     );
     io.observe($sentinel);
 }
