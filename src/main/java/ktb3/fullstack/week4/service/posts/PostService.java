@@ -82,7 +82,7 @@ public class PostService {
         int from = after + 1;
         int to = after + limit;
 
-        List<Post> raw = postRepository.findAllByIdBetween((long) from, (long) to);
+        List<Post> page = postRepository.findAllByIdBetween((long) from, (long) to);
         List<Post> next = postRepository.findAllByIdBetween((long) from + limit, (long) to + limit);
 
         /*
@@ -93,7 +93,6 @@ public class PostService {
         boolean hasNext = !next.isEmpty();
 
         System.out.println("hasNext = " + hasNext);
-        List<Post> page = hasNext ? raw.subList(0, limit) : raw;
 
         List<PostListResponse.PostBriefInfo> briefs =   new ArrayList<>(page.size());
 
