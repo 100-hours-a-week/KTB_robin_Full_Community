@@ -19,86 +19,105 @@
 </header>
 
 <main class="app-main">
-    <section class="card card--auth">
-        <h2 class="card-title">회원가입</h2>
+    <section class="card card--auth signup-card" aria-labelledby="signupTitle">
+        <header class="signup-hero">
+            <p class="signup-kicker">SIGN UP BULLETIN</p>
+            <h2 id="signupTitle" class="card-title">회원가입</h2>
+            <p class="signup-description">
+                대책 없는 솔직함을 기록하는 공간입니다. 아래 양식을 정직하게 적어 주시면,
+                검은 그림자와 함께 입장권이 발급됩니다.
+            </p>
+        </header>
 
-        <div class="avatar-uploader">
-            <div class="avatar-label">
-                <span class="avatar-title">프로필 사진</span>
-                <br>
-                <span class="helper helper--error"></span>
+        <div class="signup-grid">
+            <div class="signup-panel signup-panel--aside">
+                <div class="avatar-uploader">
+                    <div class="avatar-label">
+                        <span class="avatar-title">프로필 사진</span>
+                        <span class="helper helper--error" aria-live="polite">&nbsp;</span>
+                    </div>
+
+                    <input type="file" id="avatar" class="visually-hidden" accept="image/*"/>
+                    <label for="avatar" class="avatar-trigger" aria-label="프로필 사진 업로드" id="avatarTrigger">
+                        <span aria-hidden="true">＋</span>
+                    </label>
+                </div>
+
+                <p class="signup-note">
+                    프사 없이 입장하면 공허한 회색 원이 대신 출석합니다. 나만의 징표를 남겨보세요.
+                </p>
+
+                <ul class="signup-hint-list">
+                    <li>이메일은 실제 수신 가능한 주소여야 합니다.</li>
+                    <li>비밀번호는 8~20자, 문자·숫자를 섞어주세요.</li>
+                    <li>닉네임은 20자 이내의 실험적인 조합도 환영합니다.</li>
+                </ul>
             </div>
 
-            <input type="file" id="avatar" class="visually-hidden" accept="image/*"/>
-            <label for="avatar" class="avatar-trigger" aria-label="프로필 사진 업로드" id="avatarTrigger">
-                <span aria-hidden="true">＋</span>
-            </label>
+            <form class="form signup-form" novalidate>
+                <div class="form-group">
+                    <label for="email" class="label">이메일<span aria-hidden="true">*</span></label>
+                    <input
+                            type="email"
+                            id="email"
+                            class="input"
+                            placeholder="이메일을 입력하세요"
+                            inputmode="email"
+                            autocomplete="email"
+                            required
+                    />
+                    <p class="helper helper--error" aria-live="polite">&nbsp;</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="label">비밀번호<span aria-hidden="true">*</span></label>
+                    <input
+                            type="password"
+                            id="password"
+                            class="input"
+                            placeholder="비밀번호를 입력하세요"
+                            autocomplete="new-password"
+                            minlength="8"
+                            maxlength="20"
+                            required
+                    />
+                    <p class="helper helper--error" aria-live="polite">&nbsp;</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm" class="label">비밀번호 확인<span aria-hidden="true">*</span></label>
+                    <input
+                            type="password"
+                            id="passwordConfirm"
+                            class="input"
+                            placeholder="비밀번호를 한번 더 입력하세요"
+                            autocomplete="new-password"
+                            required
+                    />
+                    <p class="helper helper--error" aria-live="polite">&nbsp;</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="nickname" class="label">닉네임<span aria-hidden="true">*</span></label>
+                    <input
+                            type="text"
+                            id="nickname"
+                            class="input"
+                            placeholder="닉네임을 입력하세요"
+                            maxlength="20"
+                            required
+                    />
+                    <p class="helper helper--error" aria-live="polite">&nbsp;</p>
+                </div>
+
+                <button type="submit" id="signupSubmitBtn" class="btn btn--block" disabled>
+                    회원가입
+                </button>
+            </form>
         </div>
 
-        <form class="form" novalidate>
-            <div class="form-group">
-                <label for="email" class="label">이메일<span aria-hidden="true">*</span></label>
-                <input
-                        type="email"
-                        id="email"
-                        class="input"
-                        placeholder="이메일을 입력하세요"
-                        inputmode="email"
-                        autocomplete="email"
-                        required
-                />
-                <p class="helper helper--error">* helper text</p>
-            </div>
-
-            <!-- 비밀번호 -->
-            <div class="form-group">
-                <label for="password" class="label">비밀번호<span aria-hidden="true">*</span></label>
-                <input
-                        type="password"
-                        id="password"
-                        class="input"
-                        placeholder="비밀번호를 입력하세요"
-                        autocomplete="new-password"
-                        minlength="8"
-                        maxlength="20"
-                        required
-                />
-                <p class="helper helper--error">* helper text</p>
-            </div>
-
-            <!-- 비밀번호 확인 -->
-            <div class="form-group">
-                <label for="passwordConfirm" class="label">비밀번호 확인<span aria-hidden="true">*</span></label>
-                <input
-                        type="password"
-                        id="passwordConfirm"
-                        class="input"
-                        placeholder="비밀번호를 한번 더 입력하세요"
-                        autocomplete="new-password"
-                        required
-                />
-                <p class="helper helper--error">* helper text</p>
-            </div>
-
-            <div class="form-group">
-                <label for="nickname" class="label">닉네임<span aria-hidden="true">*</span></label>
-                <input
-                        type="text"
-                        id="nickname"
-                        class="input"
-                        placeholder="닉네임을 입력하세요"
-                        maxlength="20"
-                        required
-                />
-                <p class="helper helper--error">* helper text</p>
-            </div>
-
-            <button type="submit" id="signupSubmitBtn" class="btn btn--block" disabled>
-                회원가입
-            </button>
-        </form>
-
-        <div class="sub-link">
+        <div class="signup-footer">
+            <span class="signup-footer-label">이미 계정이 있나요?</span>
             <a class="link" href="login.html">로그인하러 가기</a>
         </div>
     </section>
