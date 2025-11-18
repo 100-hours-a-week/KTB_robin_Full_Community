@@ -7,6 +7,7 @@ import {
 } from "../features/users/api.js";
 import {isNicknameAvailable} from "../features/availability/api.js";
 import {logout} from "../features/auth/api.js";
+import {footerToast} from "../../app/components/Toast.js";
 
 const $email = document.getElementById("email");
 const $nickname = document.getElementById("nickname");
@@ -184,40 +185,8 @@ function bindEvents() {
             setNicknameHelper({show: false});
             setUpdateEnabled(false);
 
-            (function localFooterToast(msg = "완료", duration = 1800) {
-                const id = "local-edit-userinfo-toast";
-                const prev = document.getElementById(id);
-                if (prev) prev.remove();
+            footerToast();
 
-                const el = document.createElement("div");
-                el.id = id;
-                el.textContent = msg;
-                el.style.position = "fixed";
-                el.style.left = "50%";
-                el.style.bottom = "28px";
-                el.style.transform = "translateX(-50%)";
-                el.style.background = "#b79ef0";
-                el.style.color = "#fff";
-                el.style.padding = "10px 28px";
-                el.style.borderRadius = "999px";
-                el.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
-                el.style.zIndex = "1100";
-                el.style.fontSize = "20px";
-                el.style.opacity = "0";
-                el.style.transition = "opacity 180ms ease, transform 180ms ease";
-                document.body.appendChild(el);
-
-                requestAnimationFrame(() => {
-                    el.style.opacity = "1";
-                    el.style.transform = "translateX(-50%) translateY(-6px)";
-                });
-
-                setTimeout(() => {
-                    el.style.opacity = "0";
-                    el.style.transform = "translateX(-50%) translateY(0)";
-                    setTimeout(() => el.remove(), 220);
-                }, duration);
-            })("수정 완료", 1800);
         } catch (e) {
             console.error(e);
             setNicknameHelper({show: true, text: "닉네임 수정에 실패했습니다.", error: true});
