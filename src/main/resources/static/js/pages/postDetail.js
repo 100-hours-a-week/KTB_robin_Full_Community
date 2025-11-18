@@ -8,7 +8,8 @@ import {
     editComment,
     removeComment,
 } from "../features/posts/api.js";
-import { fetchMyEditInfo } from "../features/users/api.js";
+import {fetchMyEditInfo} from "../features/users/api.js";
+import {setAvatar} from "../../app/components/Avatar.js";
 
 // URL 파라미터
 const params = new URLSearchParams(location.search);
@@ -71,30 +72,8 @@ function lockScroll(lock) {
     document.body.classList.toggle("modal-open", lock);
 }
 
-// 아바타 설정 유틸: background-image로 세팅, 없으면 이니셜 폴백
-function setAvatar($el, url, name) {
-    if (!$el) return;
-    const safeUrl = url ? encodeURI(url) : null;
-
-    // 배경 초기화
-    $el.style.removeProperty("background-image");
-    $el.textContent = "";
-
-    if (safeUrl) {
-        // 따옴표로 감싸 특수문자 안전성 확보
-        $el.style.backgroundImage = `url("${safeUrl}")`;
-        $el.setAttribute("aria-hidden", "true");
-    } else {
-        // 이미지가 없으면 이니셜 폴백
-        const initial = (name || "?").trim().charAt(0);
-        $el.textContent = initial;
-        $el.setAttribute("aria-hidden", "false");
-        $el.title = name || "";
-    }
-}
-
 // 모달 공통 (공용 CSS 구조 사용)
-function showConfirmModal({ title = "확인", message = "계속하시겠어요?", onConfirm }) {
+function showConfirmModal({title = "확인", message = "계속하시겠어요?", onConfirm}) {
     lockScroll(true);
 
     // 컨테이너(배경)
@@ -209,7 +188,7 @@ let likeInFlight = false;
 
 // 서버 응답을 상태에 적용하고 화면을 갱신하는 헬퍼
 function applyServerState(data) {
-    const { post, is_liked, is_owner, comments } = data || {};
+    const {post, is_liked, is_owner, comments} = data || {};
     isLiked = Boolean(is_liked);
     isOwner = Boolean(is_owner);
     likeCount = Number(post?.likeCount ?? 0);
@@ -452,7 +431,7 @@ async function boot() {
         await loadCurrentUserNickname();
 
         const data = await fetchPostDetail(postId);
-        const { post, is_liked, is_owner, comments } = data || {};
+        const {post, is_liked, is_owner, comments} = data || {};
 
         // 서버 값 그대로 반영 (초기 로드시 수치 보정/증감 금지)
         isLiked = Boolean(is_liked);

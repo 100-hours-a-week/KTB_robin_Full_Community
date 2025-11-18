@@ -1,5 +1,6 @@
 // 게시글 목록 페이지 JS
 import {fetchPosts} from "../features/posts/api.js";
+import {setAvatar} from "../../app/components/Avatar.js";
 
 // 상태
 const PAGE_SIZE = 5;
@@ -72,24 +73,6 @@ function createPostCard(post) {
     });
 
     return $article;
-}
-
-// Avatar helper: mirror header/profile behavior using background-image cover/center
-function setAvatar($el, url, name) {
-    if (!$el) return;
-    const safeUrl = url ? encodeURI(url) : null;
-    // reset
-    $el.style.removeProperty("background-image");
-    $el.textContent = "";
-    if (safeUrl) {
-        $el.style.backgroundImage = `url("${safeUrl}")`;
-        $el.setAttribute("aria-hidden", "true");
-    } else {
-        const initial = (name || "?").trim().charAt(0);
-        $el.textContent = initial;
-        $el.setAttribute("aria-hidden", "false");
-        if (name) $el.title = name;
-    }
 }
 
 async function loadMore() {
