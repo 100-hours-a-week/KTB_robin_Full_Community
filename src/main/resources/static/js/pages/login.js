@@ -43,8 +43,13 @@ function onSubmit() {
     const email = emailEl.value.trim();
     const pwd = passwordEl.value;
 
-    if (!isValidEmail(email)) {
-        showHelper(invalidEmailMessage);
+    const emailCheck = isValidEmail(email);
+    if (!emailCheck.ok) {
+        if (emailCheck.reason === "empty") {
+            showHelper(invalidEmailMessage);
+        } else {
+            showHelper(invalidEmailOrPasswordMessage);
+        }
         return;
     }
 

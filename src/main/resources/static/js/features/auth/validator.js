@@ -1,7 +1,9 @@
 export function isValidEmail(value) {
-    if (!value || value.trim().length < 5) return false;
+    if (!value) return {ok: false, reason: "empty"};
+    if (value.trim().length < 5) return {ok: false, reason: "invalid"};
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(value.trim());
+    const ok = re.test(value.trim());
+    return {ok, reason: ok? null : "composition"};
 }
 
 export function isValidPassword(value) {

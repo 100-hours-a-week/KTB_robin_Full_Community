@@ -249,8 +249,14 @@ const debouncedEmailCheck = debounce(() => {
         return;
     }
     // 로컬 형식 검사 시점: API 호출 전까지는 invalid 메시지 노출
-    if (!isValidEmail(v)) {
-        showHelper(emailHelper, MSG.emailInvalid);
+
+    const emailCheck = isValidEmail(v);
+    if (!emailCheck.ok) {
+        if(emailCheck.reason === "empty") {
+            showHelper(emailHelper, MSG.emailEmpty);
+        } else {
+            showHelper(emailHelper, MSG.emailInvalid);
+        }
         state.emailOk = false;
         updateSubmitState();
         return;
