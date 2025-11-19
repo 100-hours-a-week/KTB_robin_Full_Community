@@ -103,7 +103,7 @@
     justify-content: center;
 
     color: #fff;
-    background: var(--primary);
+    background: #050505;
     cursor: pointer;
 
     font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
@@ -115,7 +115,7 @@
 
     transition: background-color .2s ease, opacity .2s ease;
 }
-.btn--pill:hover { background: var(--primary-hover); }
+.btn--pill:hover { background: #050505; }
 
 .editUserInfo__more {
     margin-top: 8px;
