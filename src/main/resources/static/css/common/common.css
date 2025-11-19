@@ -94,6 +94,14 @@ button, input, textarea, select {
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
+.app-title .app-back {
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -28px;
+    margin-right: 50px;
+}
+
 .app-title .app-back:hover,
 .app-title .app-profile:hover,
 .app-title .app-back:focus-visible,
