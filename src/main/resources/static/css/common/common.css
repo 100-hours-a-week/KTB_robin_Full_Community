@@ -47,6 +47,14 @@ button, input, textarea, select {
     color: inherit;
 }
 
+.hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
 .app-header {
     width: 100%;
     border-bottom: 3px solid var(--border);

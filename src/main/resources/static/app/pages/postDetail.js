@@ -26,6 +26,8 @@ const $container = document.getElementById("postContainer");
 
 const $likeBtn = document.getElementById("likeBtn");
 const $editBtn = document.getElementById("postEditBtn");
+
+// $editBtn.classList.add('hidden');
 const $deleteBtn = document.getElementById("postDeleteBtn");
 
 // 대표 이미지 엘리먼트
@@ -201,7 +203,13 @@ function applyServerState(data) {
     // 댓글의 수정/삭제 버튼 노출은 '현재 로그인 유저' 기준으로 판단해야 함
     renderComments(comments || [], currentUserNickname);
 
-    if ($editBtn) $editBtn.hidden = !isOwner;
+    console.log(isOwner);
+    if ($editBtn && !isOwner) {
+        // $editBtn.setAttribute(display, 'none');
+        console.log('run');
+        $editBtn.classList.add('hidden');
+
+    }
     if ($deleteBtn) $deleteBtn.hidden = !isOwner;
 
     if ($container) $container.hidden = false;
@@ -293,7 +301,7 @@ function renderPost(post) {
     }
 
     // 글 상단 작성자 아바타 설정
-    const $postAuthorAvatar = document.querySelector(".post-head .author-avatar");
+    const $postAuthorAvatar = document.querySelector(".post-meta .author-avatar");
     if ($postAuthorAvatar) {
         setAvatar($postAuthorAvatar, post.authorProfileImageUrl, post.author);
     }
@@ -431,11 +439,16 @@ async function boot() {
         await loadCurrentUserNickname();
 
         const data = await fetchPostDetail(postId);
-        const {post, is_liked, is_owner, comments} = data || {};
+        const {post, comments, liked, owner} = data || {};
+
+        if ($editBtn && !isOwner) $editBtn.classList.add('hidden');
+        if ($deleteBtn && !isOwner) $deleteBtn.classList.add('hidden');
+
+        if ($container) $container.hidden = false;
 
         // 서버 값 그대로 반영 (초기 로드시 수치 보정/증감 금지)
-        isLiked = Boolean(is_liked);
-        isOwner = Boolean(is_owner);
+        isLiked = Boolean(liked);
+        isOwner = Boolean(owner);
 
         // 수치 필드도 서버 값을 신뢰
         likeCount = Number(post?.likeCount ?? 0);
@@ -447,10 +460,6 @@ async function boot() {
         // 댓글의 수정/삭제 버튼 노출은 로그인 유저 기준
         renderComments(comments || [], currentUserNickname);
 
-        if ($editBtn) $editBtn.hidden = !isOwner;
-        if ($deleteBtn) $deleteBtn.hidden = !isOwner;
-
-        if ($container) $container.hidden = false;
     } catch (e) {
         console.error(e);
     }
@@ -458,4 +467,4 @@ async function boot() {
 
 // 최초 상태
 if ($commentSubmit) setSubmitEnabled(false);
-boot();
+await boot();

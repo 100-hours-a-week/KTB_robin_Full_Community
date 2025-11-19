@@ -10,6 +10,14 @@
     align-items: flex-start;
 }
 
+.hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
 .post {
     width: 100%;
     max-width: 960px;
