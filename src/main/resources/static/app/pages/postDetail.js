@@ -74,6 +74,19 @@ function lockScroll(lock) {
     document.body.classList.toggle("modal-open", lock);
 }
 
+function updateOwnerControls(ownerFlag) {
+    const shouldShow = Boolean(ownerFlag);
+    const toggleBtn = ($btn) => {
+        if (!$btn) return;
+        $btn.classList.toggle("hidden", !shouldShow);
+        $btn.classList.toggle("show", shouldShow);
+        $btn.hidden = !shouldShow;
+    };
+
+    toggleBtn($editBtn);
+    toggleBtn($deleteBtn);
+}
+
 // 모달 공통 (공용 CSS 구조 사용)
 function showConfirmModal({title = "확인", message = "계속하시겠어요?", onConfirm}) {
     lockScroll(true);
@@ -189,28 +202,26 @@ function ensureCommentTemplate() {
 let likeInFlight = false;
 
 // 서버 응답을 상태에 적용하고 화면을 갱신하는 헬퍼
-function applyServerState(data) {
-    const {post, is_liked, is_owner, comments} = data || {};
-    isLiked = Boolean(is_liked);
-    isOwner = Boolean(is_owner);
+function applyServerState(data = {}) {
+    const post = data.post || {};
+    const comments = Array.isArray(data.comments) ? data.comments : [];
+
+    const likedFlag = data.liked ?? false;
+    const ownerFlag = data.owner ?? false;
+
+    isLiked = Boolean(likedFlag);
+    isOwner = Boolean(ownerFlag);
     likeCount = Number(post?.likeCount ?? 0);
     viewCount = Number(post?.viewCount ?? 0);
-    commentCount = (post?.comments ?? comments?.length ?? 0);
+    commentCount = Number(post?.commentCount ?? comments.length ?? 0);
 
     // 본문/이미지만 렌더 (카운트는 상태값 기준으로 renderCounts에서 처리)
-    renderPost(post || {});
+    renderPost(post);
     renderCounts();
     // 댓글의 수정/삭제 버튼 노출은 '현재 로그인 유저' 기준으로 판단해야 함
-    renderComments(comments || [], currentUserNickname);
+    renderComments(comments, currentUserNickname);
 
-    console.log(isOwner);
-    if ($editBtn && !isOwner) {
-        // $editBtn.setAttribute(display, 'none');
-        console.log('run');
-        $editBtn.classList.add('hidden');
-
-    }
-    if ($deleteBtn) $deleteBtn.hidden = !isOwner;
+    updateOwnerControls(isOwner);
 
     if ($container) $container.hidden = false;
 }
@@ -435,31 +446,8 @@ async function boot() {
     if (!postId) return;
 
     try {
-        // 현재 로그인 사용자 닉네임을 먼저 로드하여 댓글 UI 소유권 판단에 사용
         await loadCurrentUserNickname();
-
-        const data = await fetchPostDetail(postId);
-        const {post, comments, liked, owner} = data || {};
-
-        if ($editBtn && !isOwner) $editBtn.classList.add('hidden');
-        if ($deleteBtn && !isOwner) $deleteBtn.classList.add('hidden');
-
-        if ($container) $container.hidden = false;
-
-        // 서버 값 그대로 반영 (초기 로드시 수치 보정/증감 금지)
-        isLiked = Boolean(liked);
-        isOwner = Boolean(owner);
-
-        // 수치 필드도 서버 값을 신뢰
-        likeCount = Number(post?.likeCount ?? 0);
-        viewCount = Number(post?.viewCount ?? 0);
-        commentCount = (post?.comments ?? comments?.length ?? 0);
-
-        renderPost(post || {}); // 내부에서 like/view/comment를 덮어쓰지 않게 주의
-        renderCounts();
-        // 댓글의 수정/삭제 버튼 노출은 로그인 유저 기준
-        renderComments(comments || [], currentUserNickname);
-
+        await refreshPostState();
     } catch (e) {
         console.error(e);
     }
