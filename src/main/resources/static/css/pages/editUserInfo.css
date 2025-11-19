@@ -1,3 +1,7 @@
+.app-main {
+    margin-top: 100px;
+    height: 544px;
+}
 .app-title .app-profile {
     position: absolute;
     top: 50%;
@@ -7,7 +11,7 @@
 }
 
 .card--auth .card-title {
-    margin-top: 50px;
+    /*margin-top: 50px;*/
     margin-bottom: 12px;
 }
 
@@ -127,5 +131,9 @@
 
 
 .form-group {
-    margin-left: 25px;
+    margin-left: 21px;
+}
+
+.btn--block {
+    margin-left: 21px;
 }
