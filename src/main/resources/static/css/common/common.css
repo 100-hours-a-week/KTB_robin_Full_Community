@@ -73,6 +73,7 @@ button, input, textarea, select {
     font-size: 32px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    overflow: visible;
 }
 
 .app-title .app-back,
@@ -120,6 +121,19 @@ button, input, textarea, select {
     background: var(--surface);
     border-radius: 999px;
     appearance: none;
+    position: relative;
+    z-index: 50;
+}
+
+.app-profile-wrapper {
+    position: absolute;
+    top: 50%;
+    right: 48px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    overflow: visible;
 }
 
 .app-title .app-profile[data-state="open"] {
@@ -146,41 +160,45 @@ button, input, textarea, select {
 }
 
 .profile-menu {
-    position: absolute;
-    left: calc(100% + 160px);
-    top: calc(50% + 50px);
-    display: none;
-    flex-direction: column;
-    min-width: 180px;
-    background: var(--surface);
-    border: 3px solid var(--border);
-    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
-    z-index: 1100;
+    position: relative;
+    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity .25s ease, transform .3s ease;
+    z-index: 60;
 }
 
 .profile-menu.is-open {
-    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
 }
 
 .profile-menu__item {
     display: block;
-    padding: 14px 18px;
-    border-top: 3px solid var(--border);
+    padding: 10px 14px;
+    border: 3px solid var(--border);
+    border-radius: 999px;
     text-decoration: none;
     font-weight: 700;
     font-size: 14px;
     text-transform: uppercase;
     background: var(--surface);
-}
-
-.profile-menu__item:first-child {
-    border-top: none;
+    text-align: center;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
+    transition: transform .2s ease, background .2s ease;
+    position: relative;
 }
 
 .profile-menu__item:hover,
 .profile-menu__item:focus-visible {
     background: var(--accent);
     color: #fff;
+    transform: translateY(-2px);
 }
 
 .app-main {

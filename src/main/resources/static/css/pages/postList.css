@@ -1,3 +1,11 @@
+.app-title .app-profile {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -28px;
+    margin-left: 80px;
+}
+
 .feed {
     width: 100%;
     /*max-width: 960px;*/
@@ -51,14 +59,14 @@
     margin: 0;
 }
 
-.feed-stamp {
-    border: 3px solid var(--border);
-    padding: 10px 16px;
-    font-weight: 800;
-    font-size: 14px;
-    text-transform: uppercase;
-    box-shadow: 6px 6px 0 var(--shadow-color);
-}
+/*.feed-stamp {*/
+/*    border: 3px solid var(--border);*/
+/*    padding: 10px 16px;*/
+/*    font-weight: 800;*/
+/*    font-size: 14px;*/
+/*    text-transform: uppercase;*/
+/*    box-shadow: 6px 6px 0 var(--shadow-color);*/
+/*}*/
 
 .feed-description {
     margin: 0 0 18px 0;
@@ -67,22 +75,22 @@
     line-height: 1.4;
 }
 
-.feed-hero__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-}
+/*.feed-hero__meta {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    gap: 12px;*/
+/*    margin-bottom: 20px;*/
+/*}*/
 
-.feed-pill {
-    border: 3px solid var(--border);
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-    background: var(--surface);
-    box-shadow: 4px 4px 0 var(--shadow-color);
-}
+/*.feed-pill {*/
+/*    border: 3px solid var(--border);*/
+/*    padding: 6px 14px;*/
+/*    font-size: 13px;*/
+/*    font-weight: 800;*/
+/*    text-transform: uppercase;*/
+/*    background: var(--surface);*/
+/*    box-shadow: 4px 4px 0 var(--shadow-color);*/
+/*}*/
 
 .feed-pill--dark {
     background: var(--border);

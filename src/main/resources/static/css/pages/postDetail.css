@@ -1,3 +1,11 @@
+.app-title .app-profile {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -28px;
+    margin-left: 80px;
+}
+
 .app-main.post {
     align-items: flex-start;
 }
