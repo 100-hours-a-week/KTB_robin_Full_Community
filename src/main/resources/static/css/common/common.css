@@ -125,10 +125,10 @@ button, input, textarea, select {
     z-index: 50;
 }
 
-.app-profile-wrapper {
+.app-title .app-profile-wrapper {
     position: absolute;
     top: 50%;
-    right: 48px;
+    right: 15%;
     transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
@@ -161,6 +161,7 @@ button, input, textarea, select {
 
 .profile-menu {
     position: relative;
+    left: 150%;
     margin-left: 4px;
     display: inline-flex;
     align-items: center;
@@ -179,6 +180,7 @@ button, input, textarea, select {
 }
 
 .profile-menu__item {
+    width: 120px;
     display: block;
     padding: 10px 14px;
     border: 3px solid var(--border);

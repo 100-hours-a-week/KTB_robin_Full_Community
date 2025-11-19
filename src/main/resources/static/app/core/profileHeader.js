@@ -107,7 +107,7 @@ import {logout, refresh} from "../features/auth/api.js";
         profileWrapper.className = "app-profile-wrapper";
         profileWrapper.appendChild(profileBtn);
         profileWrapper.appendChild(menu);
-        header.appendChild(profileWrapper);
+        title.appendChild(profileWrapper);
 
         function openMenu() {
             menu.classList.add("is-open");
