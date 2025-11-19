@@ -1,3 +1,11 @@
+.app-title .app-profile {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -28px;
+    margin-left: 80px;
+}
+
 .card--auth .card-title {
     margin-top: 50px;
     margin-bottom: 12px;
