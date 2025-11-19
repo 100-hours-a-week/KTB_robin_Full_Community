@@ -8,9 +8,10 @@ import {logout, refresh} from "../features/auth/api.js";
     }
 
     function mountIfNeeded() {
-        const title = document.querySelector(".app-header .app-title");
-        if (!title) return;
-        if (title.querySelector(".app-profile")) return;
+        const header = document.querySelector(".app-header");
+        const title = header?.querySelector(".app-title");
+        if (!header || !title) return;
+        if (header.querySelector(".app-profile")) return;
 
         const profileBtn = document.createElement("button");
         profileBtn.type = "button";
@@ -24,11 +25,6 @@ import {logout, refresh} from "../features/auth/api.js";
         avatar.className = "app-profile__avatar";
         avatar.setAttribute("aria-hidden", "true");
         profileBtn.appendChild(avatar);
-
-        const label = document.createElement("span");
-        label.className = "app-profile__label";
-        label.textContent = "PROFILE";
-        profileBtn.appendChild(label);
 
         try {
             const storedUrl = localStorage.getItem("profile_image_url");
@@ -107,8 +103,11 @@ import {logout, refresh} from "../features/auth/api.js";
         menu.appendChild(itemPw);
         menu.appendChild(itemLogout);
 
-        title.appendChild(profileBtn);
-        title.appendChild(menu);
+        const profileWrapper = document.createElement("div");
+        profileWrapper.className = "app-profile-wrapper";
+        profileWrapper.appendChild(profileBtn);
+        profileWrapper.appendChild(menu);
+        header.appendChild(profileWrapper);
 
         function openMenu() {
             menu.classList.add("is-open");
@@ -133,7 +132,7 @@ import {logout, refresh} from "../features/auth/api.js";
         }
 
         function handleOutside(e) {
-            if (!menu.contains(e.target) && !profileBtn.contains(e.target)) {
+            if (!menu.contains(e.target) && !profileWrapper.contains(e.target)) {
                 closeMenu();
             }
         }
