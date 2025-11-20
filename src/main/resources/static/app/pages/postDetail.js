@@ -187,8 +187,8 @@ function ensureCommentTemplate() {
           </div>
         </div>
         <div class="comment-actions">
-          <button type="button" class="btn--ghost btn-edit" hidden>수정</button>
-          <button type="button" class="btn--ghost btn-remove" hidden>삭제</button>
+          <button type="button" class="btn btn--ghost btn-edit" hidden>수정</button>
+          <button type="button" class="btn btn--ghost btn-remove" hidden>삭제</button>
         </div>
       </header>
       <div class="comment-body"></div>
