@@ -16,6 +16,7 @@ const $btnUpdate = document.getElementById("btnUpdateProfile");
 const $btnLeave = document.getElementById("btnLeave");
 const $file = document.getElementById("profileImage");
 const $avatarTrigger = document.querySelector("label.avatar-trigger");
+const $avatar = document.getElementById("avatar-trigger");
 
 let originalNickname = "";
 let debounceTimer = null;
@@ -107,6 +108,54 @@ function showConfirmModal({title = "확인", message = "계속하시겠어요?",
     window.addEventListener("keydown", onKey);
     document.body.appendChild($modal);
     $ok.focus();
+}
+
+function hideFooterToast() {
+    const $footerToast = document.getElementById("toast");
+    if ($footerToast) {
+        $footerToast.hidden = true;
+    }
+}
+
+function preloadStoredAvatar() {
+    if (!$avatar) return;
+    try {
+        const storedUrl = localStorage.getItem("profile_image_url");
+        if (!storedUrl || typeof storedUrl !== "string") return;
+        const url = storedUrl.trim();
+        if (!url) return;
+
+        $avatar.style.backgroundImage = `url("${encodeURI(url)}")`;
+        $avatar.style.backgroundSize = "cover";
+        $avatar.style.backgroundPosition = "center";
+        $avatar.style.backgroundRepeat = "no-repeat";
+        $avatar.style.opacity = 0.5;
+        $avatar.setAttribute("aria-hidden", "true");
+    } catch (_) {
+    }
+}
+
+function setEmailValue(emailVal) {
+    if (!$email) return;
+    if ($email.tagName === "INPUT") {
+        $email.value = emailVal;
+        $email.setAttribute("readonly", "true");
+        $email.setAttribute("aria-readonly", "true");
+        $email.tabIndex = -1;
+        $email.classList.add("input--readonly");
+    } else {
+        $email.textContent = emailVal;
+    }
+}
+
+function setNicknameValue(nickname) {
+    originalNickname = nickname;
+    if ($nickname) $nickname.value = nickname;
+}
+
+function resetNicknameState() {
+    setNicknameHelper({show: false});
+    setUpdateEnabled(false);
 }
 
 function bindEvents() {
@@ -241,52 +290,18 @@ async function validateNickname() {
     }
 }
 
+async function loadUserInfo() {
+    const me = await fetchMyEditInfo();
+    setEmailValue(me?.email || "");
+    setNicknameValue(me?.nickname || "");
+    resetNicknameState();
+}
+
 async function boot() {
+    hideFooterToast();
+    preloadStoredAvatar();
     try {
-        try {
-            const $footerToast = document.getElementById("toast");
-            if ($footerToast) {
-                $footerToast.hidden = true;
-            }
-        } catch (_) {}
-
-        // 프로필 이미지 로딩
-        const avatar = document.getElementById("avatar-trigger");
-        try {
-            const storedUrl = localStorage.getItem("profile_image_url");
-            if (storedUrl && typeof storedUrl === "string") {
-                const url = storedUrl.trim();
-                if (url && avatar) {
-                    avatar.style.backgroundImage = `url("${encodeURI(url)}")`;
-                    avatar.style.backgroundSize = "cover";
-                    avatar.style.backgroundPosition = "center";
-                    avatar.style.backgroundRepeat = "no-repeat";
-                    avatar.style.opacity = 0.5;
-                    avatar.setAttribute("aria-hidden", "true");
-                }
-            }
-        } catch (_) {
-        }
-
-        const me = await fetchMyEditInfo(); // { email, nickname }
-        if ($email) {
-            const emailVal = me?.email || "";
-            if ($email.tagName === "INPUT") {
-                $email.value = emailVal;
-
-                $email.setAttribute("readonly", "true");
-                $email.setAttribute("aria-readonly", "true");
-                $email.tabIndex = -1;
-                $email.classList.add("input--readonly");
-            } else {
-                $email.textContent = emailVal;
-            }
-        }
-        originalNickname = me?.nickname || "";
-        if ($nickname) $nickname.value = originalNickname;
-
-        setNicknameHelper({show: false});
-        setUpdateEnabled(false);
+        await loadUserInfo();
     } catch (e) {
         console.error(e);
     }
