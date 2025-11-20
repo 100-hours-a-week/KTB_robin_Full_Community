@@ -68,24 +68,22 @@ function onSubmit() {
     redirectTimer = callLoginApi(email, pwd);
 }
 
-function callLoginApi(email, pwd) {
-    return setTimeout(async () => {
-        try {
-            await login({ email, password: pwd });
-            setButtonColor(COLOR_DEFAULT);
-            window.location.href = "postList.html";
-        } catch (e) {
-            const msg = e?.message;
-            if (msg === "invalid_email_or_password") {
-                showHelper(invalidEmailOrPasswordMessage);
-            } else {
-                showHelper(loginFailedThenRetryMessage);
-            }
-            setButtonColor(COLOR_DEFAULT);
-        } finally {
-            redirectTimer = null;
+async function callLoginApi(email, pwd) {
+    try {
+        await login({email, password: pwd});
+        setButtonColor(COLOR_DEFAULT);
+        window.location.href = "postList.html";
+    } catch (e) {
+        const msg = e?.message;
+        if (msg === "invalid_email_or_password") {
+            showHelper(invalidEmailOrPasswordMessage);
+        } else {
+            showHelper(loginFailedThenRetryMessage);
         }
-    }, 3000);
+        setButtonColor(COLOR_DEFAULT);
+    } finally {
+        redirectTimer = null;
+    }
 }
 
 function onTyping() {
