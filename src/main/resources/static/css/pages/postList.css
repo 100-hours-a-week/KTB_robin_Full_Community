@@ -27,7 +27,7 @@
 }
 
 .feed-hero::after {
-    content: "WARNING";
+    content: "POSTING";
     position: absolute;
     right: 20px;
     bottom: -10px;
