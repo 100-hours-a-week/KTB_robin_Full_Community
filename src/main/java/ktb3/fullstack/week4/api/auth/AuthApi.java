@@ -26,10 +26,10 @@ public interface AuthApi {
                             {
                                 "message" : "login_success",
                                 "data" : {
-                                     "profile_image_url": 1a3e8a9f-9d95-41eb-b076-485b113e24db여세요.PNG"
+                                     "profile_image_url": "1a3e8a9f-9d95-41eb-b076-485b113e24db여세요.PNG",
                                      "access_token": "eyJhbGciOi ...",
                                      "token_type": "Bearer",
-                                     "access_expired_in": 3600,\s
+                                     "access_expired_in": 3600,
                                      "refresh_expired_in": 604800
                                  }
                             }
@@ -61,7 +61,7 @@ public interface AuthApi {
                                 "data" : {
                                      "access_token": "eyJhbGciOi ...",
                                      "token_type": "Bearer",
-                                     "access_expired_in": 3600  \s
+                                     "access_expired_in": 3600
                                  }
                             }
                             """),

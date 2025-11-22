@@ -14,10 +14,8 @@ public class PostDetailResponse {
     @JsonProperty("post")
     private PostInfo post;
 
-    @JsonProperty("is_liked")
     private boolean isLiked;
 
-    @JsonProperty("is_owner")
     private boolean isOwner;
 
     @JsonProperty("comments")

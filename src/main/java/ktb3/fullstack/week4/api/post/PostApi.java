@@ -129,10 +129,11 @@ public interface PostApi {
                                                "comments": 200,
                                                "views": 12000,
                                                "author": "robin",
-                                               "modified_at": "2025-09-30T20:30:15+09:00"
+                                               "modified_at": "2025-09-30T20:30:15+09:00",
                                                "image_url": "http://www.example.com/images/image1234.jpg"
                                       },
-                                      "is_liked": false,
+                                      "liked": false,
+                                      "owner": false,
                                       "comments": [
                                             {
                                                 "id": 1,
@@ -305,7 +306,7 @@ public interface PostApi {
                                 "message" : "like_success",
                                 "data" : {
                                     "likes": 9877,
-                                    "is_liked": true
+                                    "liked": true
                                 }
                             }
                             """),
@@ -338,7 +339,7 @@ public interface PostApi {
                                 "message" : "unlike_success",
                                 "data" :  {
                                     "likes": 9875,
-                                    "is_liked": false
+                                    "liked": false
                                  }
                             }
                             """),
