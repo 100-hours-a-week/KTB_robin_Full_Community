@@ -41,5 +41,7 @@ out/
 src/main/java/ktb3/fullstack/week4/repository/images/ImageRepository.java
 src/main/resources/static/js/core/httpClient.js
 
-!src/main/resources/static/assets/images/**
+src/main/resources/static/assets/images/**
 src/main/resources/static/assets/localImages
+
+AGENTS.md
