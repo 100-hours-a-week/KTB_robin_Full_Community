@@ -1,6 +1,6 @@
 package ktb3.fullstack.week4.service.users;
 
-import ktb3.fullstack.week4.common.security.PasswordHasher;
+import ktb3.fullstack.week4.Security.service.AppPasswordEncoder;
 import ktb3.fullstack.week4.domain.images.ProfileImage;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.users.*;
@@ -25,7 +25,7 @@ public class UserService {
     private final UserDomainBuilder userDomainBuilder;
     private final ImageDomainBuilder imageDomainBuilder;
 
-    private final PasswordHasher passwordHasher;
+    private final AppPasswordEncoder passwordEncoder;
 
     private final ErrorCheckServiceImpl errorCheckService;
     private final ProfileImageService profileImageService;
@@ -38,7 +38,7 @@ public class UserService {
 
     @Transactional
     public void register(JoinRequest dto, MultipartFile image) {
-        String hashedPassword = passwordHasher.hash(dto.getPassword());
+        String hashedPassword = passwordEncoder.encode(dto.getPassword());
         User user = userDomainBuilder.buildUser(hashedPassword, dto);
 
         String profileImageUrl = profileImageService.makeImagePathString(image);
@@ -73,7 +73,7 @@ public class UserService {
     @Transactional
     public void changePassword(long userId, PasswordUpdateRequest newPassword) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
-        String hashedPassword = passwordHasher.hash(newPassword.getNewPassword());
+        String hashedPassword = passwordEncoder.encode(newPassword.getNewPassword());
         user.changePassword(hashedPassword);
     }
 

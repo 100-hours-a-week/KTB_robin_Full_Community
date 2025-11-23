@@ -3,13 +3,13 @@ package ktb3.fullstack.week4.service.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import ktb3.fullstack.week4.auth.JwtTokenProvider;
+import ktb3.fullstack.week4.Security.jwt.JwtTokenProvider;
+import ktb3.fullstack.week4.Security.service.AppPasswordEncoder;
 import ktb3.fullstack.week4.common.error.codes.AuthError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
 import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
-import ktb3.fullstack.week4.common.security.PasswordHasher;
-import ktb3.fullstack.week4.common.util.CookieUtil;
+import ktb3.fullstack.week4.Security.util.CookieUtil;
 import ktb3.fullstack.week4.domain.auth.RefreshToken;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.auth.LoginResponse;
@@ -35,7 +35,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final ProfileImageRepository profileImageRepository;
-    private final PasswordHasher passwordHasher;
+    private final AppPasswordEncoder passwordEncoder;
 
     @Transactional
     public LoginResponse login(@Valid LoginRequest dto, HttpServletResponse response) {
@@ -53,7 +53,7 @@ public class AuthService {
         }
 
         // 비밀번호 유효성 검사
-        if (!passwordHasher.matches(dto.getPassword(), user.getHashedPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), user.getHashedPassword())) {
             throw new ApiException(AuthError.INVALID_EMAIL_OR_PASSWORD);
         }
 
