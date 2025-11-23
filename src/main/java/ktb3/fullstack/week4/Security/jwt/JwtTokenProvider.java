@@ -1,4 +1,4 @@
-package ktb3.fullstack.week4.auth;
+package ktb3.fullstack.week4.Security.jwt;
 
 
 import lombok.Getter;
@@ -14,10 +14,16 @@ import java.util.Date;
 import java.util.Optional;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 
 @Getter
+@Component
 public class JwtTokenProvider {
 
     private static final String ACCESS_SECRET_BASE64 = "MzQ2N2I2MjM2YzU2YzQzYjY5MzY5NzNhMzQ2N2I2MjM2YzU2YzQzYjY5MzY5NzNh"; // 예시 base64
@@ -30,9 +36,21 @@ public class JwtTokenProvider {
     private final Key accessKey;
     private final Key refreshKey;
 
-    public JwtTokenProvider() {
+    private final UserDetailsService userDetailsService;
+
+    public JwtTokenProvider(UserDetailsService userDetailsService) {
         this.accessKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(ACCESS_SECRET_BASE64));
         this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(REFRESH_SECRET_BASE64));
+        this.userDetailsService = userDetailsService;
+    }
+
+    public Authentication getAuthentication(String token) {
+        Long userId = getUserIdFromAccessToken(token).
+                orElseThrow(() -> new JwtException("토큰에 회원 id가 없습니다."));
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(userId));
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String generateAccessToken(long userId) {
