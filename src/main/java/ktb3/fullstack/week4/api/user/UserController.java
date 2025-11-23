@@ -1,7 +1,7 @@
 package ktb3.fullstack.week4.api.user;
 
 import jakarta.validation.Valid;
-import ktb3.fullstack.week4.auth.JwtAuthInterceptor;
+import ktb3.fullstack.week4.Security.context.SecurityUser;
 import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
 import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
@@ -10,6 +10,7 @@ import ktb3.fullstack.week4.service.availabilities.AvailabilityService;
 import ktb3.fullstack.week4.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,8 +38,8 @@ public class UserController implements UserApi {
     @AccessTokenExpireResponse
     @GetMapping("/me")
     public ApiResponse<UserEditPageResponse> getUserInfoForEditPage(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
-            UserEditPageResponse result = userService.getUserInfoForEditPage(userId);
+            @AuthenticationPrincipal SecurityUser user) {
+            UserEditPageResponse result = userService.getUserInfoForEditPage(user.getId());
         return ApiResponse.ok(result, "nickname_edit_success");
     }
 
@@ -46,8 +47,8 @@ public class UserController implements UserApi {
     @AccessTokenExpireResponse
     @DeleteMapping("/me")
     public ApiResponse<Void> withdrawMemberShip(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
-        userService.withdrawMemberShip(userId);
+            @AuthenticationPrincipal SecurityUser user) {
+        userService.withdrawMemberShip(user.getId());
         return ApiResponse.ok("membership_withdraw_success");
     }
 
@@ -55,10 +56,10 @@ public class UserController implements UserApi {
     @AccessTokenExpireResponse
     @PatchMapping("/me/nickname") //회원정보 수정 - 닉네임
     public ApiResponse<NicknameUpdateResponse> changeNickname(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @AuthenticationPrincipal SecurityUser user,
             @Valid @RequestBody NicknameUpdateRequest dto) {
         availabilityService.checkNewNicknameAvailability(dto);
-        NicknameUpdateResponse result = userService.changeNickname(userId, dto);
+        NicknameUpdateResponse result = userService.changeNickname(user.getId(), dto);
         return ApiResponse.ok(result, "nickname_edit_success");
     }
 
@@ -66,9 +67,9 @@ public class UserController implements UserApi {
     @AccessTokenExpireResponse
     @PatchMapping("/me/password") //회원정보 수정 - 비밀번호
     public ApiResponse<PasswordUpdateRequest> changePassword(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId,
+            @AuthenticationPrincipal SecurityUser user,
             @Valid @RequestBody PasswordUpdateRequest dto) {
-        userService.changePassword(userId, dto);
+        userService.changePassword(user.getId(), dto);
         return ApiResponse.ok("password_edit_success");
     }
 
@@ -77,10 +78,10 @@ public class UserController implements UserApi {
     @PatchMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProfileImageUrlResponse> registerNewProfileImage(
             @RequestPart(value = "profile_image") MultipartFile newProfileImage,
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
+            @AuthenticationPrincipal SecurityUser user) {
         // 생성된 url이 담겨 나간다
         ProfileImageUrlResponse reponse = new ProfileImageUrlResponse(
-                userService.changeProfileImage(userId, newProfileImage)
+                userService.changeProfileImage(user.getId(), newProfileImage)
         );
         return ApiResponse.ok(reponse, "profile_image_upload_success");
     }
@@ -89,10 +90,10 @@ public class UserController implements UserApi {
     @AccessTokenExpireResponse
     @DeleteMapping("/me/profile-image")
     public ApiResponse<ProfileImageUrlResponse> removeProfileImage(
-            @RequestAttribute(JwtAuthInterceptor.USER_ID) long userId) {
+            @AuthenticationPrincipal SecurityUser user) {
         // 삭제한 이미지의 url이 담겨 나간다 (만약 클라이언트에서 url을 캐싱하고 있었다면 삭제 가능)
         ProfileImageUrlResponse reponse =
-                new ProfileImageUrlResponse(userService.deleteProfileImage(userId));
+                new ProfileImageUrlResponse(userService.deleteProfileImage(user.getId()));
         return ApiResponse.ok(reponse, "profile_image_delete_success");
     }
 }
