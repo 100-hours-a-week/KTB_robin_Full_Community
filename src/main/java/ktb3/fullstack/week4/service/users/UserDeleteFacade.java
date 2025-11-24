@@ -66,7 +66,7 @@ public class UserDeleteFacade {
         // 리프레시 토큰 (hard)
         refreshTokenRepository.deleteByUserId(userId);
         // 사용자 본인
-        user.deleteUser(); // deleted = true + deletedAt 최신화
+        user.deleteEntity(); 
 
         // 조회수는 남겨 놓기. 만약 일정기간 이후 게시글 완전삭제 된다면, 그 때 hard delete
     }

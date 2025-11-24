@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class SecurityUser implements UserDetails {
     private final String nickname;
 
     // 권한
-//    private final String role;
+    private final String role;
 
     // User 엔티티로부터 SecurityUser를 생성하는 생성자
     public SecurityUser(User user) {
@@ -34,16 +34,12 @@ public class SecurityUser implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getHashedPassword();
         this.nickname = user.getNickname();
-//        this.role = user.getRole().toString();
-        // User 엔티티에 role 을 추가 후 securityUser 생성자에도 권한주입 코드 추가하기
+        this.role = user.getRole();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 아직 Role 관련 요구사항이 없으므로 빈 리스트 반환
-        // role 을 User에 추가하면, 컬렉션에 role 을 넣은 리스트를 반환하도록 수정하기
-        return Collections.emptyList();
-//        return List.of(this.role);
+        return List.of(this::getRole);
     }
 
     @Override

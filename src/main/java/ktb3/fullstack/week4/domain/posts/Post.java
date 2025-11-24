@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.NonNull;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +37,6 @@ public class Post extends SoftDeletetionEntity {
     @NonNull
     @Column(name = "content")
     private String content;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
 
     @Builder.Default

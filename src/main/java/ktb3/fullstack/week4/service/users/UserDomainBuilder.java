@@ -13,6 +13,7 @@ public class UserDomainBuilder {
                 .email(dto.getEmail())
                 .hashedPassword(hashedPassword)
                 .nickname(dto.getNickname())
+                .role("USER")
                 .build();
     }
 

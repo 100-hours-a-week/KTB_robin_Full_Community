@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +31,8 @@ public class User extends SoftDeletetionEntity {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Column(name = "role", columnDefinition = "VARCHAR(10) default 'USER'")
+    private String role;
 
     @Builder.Default
     @SQLRestriction("deleted = false") // 모든 조회 쿼리에 자동으로 "where deleted = false" 추가
@@ -47,10 +46,5 @@ public class User extends SoftDeletetionEntity {
 
     public void changePassword(String newPassword) {
         hashedPassword = newPassword;
-    }
-
-    public void deleteUser() {
-        this.deleteEntity();
-        this.deletedAt = LocalDateTime.now();
     }
 }
