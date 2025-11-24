@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public static final String EMPTY_TOKEN = "EMPTY";
+    public static final String EMPTY_TOKEN = "Optional.empty";
 
 
     @Override
