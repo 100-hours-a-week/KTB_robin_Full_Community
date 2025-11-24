@@ -45,6 +45,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
+        token = decapsulate(token);
         Long userId = getUserIdFromAccessToken(token).
                 orElseThrow(() -> new JwtException("토큰에 회원 id가 없습니다."));
 
@@ -134,5 +135,10 @@ public class JwtTokenProvider {
             }
         }
         return Optional.empty();
+    }
+
+    private String decapsulate(String capsulated) {
+        String[] arr = capsulated.split("\\[");
+        return arr[1].substring(0, arr[1].length()-1);
     }
 }
