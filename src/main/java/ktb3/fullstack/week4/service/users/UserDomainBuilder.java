@@ -1,5 +1,6 @@
 package ktb3.fullstack.week4.service.users;
 
+import ktb3.fullstack.week4.domain.users.Role;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.users.JoinRequest;
 import ktb3.fullstack.week4.dto.users.UserEditPageResponse;
@@ -13,7 +14,7 @@ public class UserDomainBuilder {
                 .email(dto.getEmail())
                 .hashedPassword(hashedPassword)
                 .nickname(dto.getNickname())
-                .role("USER")
+                .role(Role.USER.toString())
                 .build();
     }
 

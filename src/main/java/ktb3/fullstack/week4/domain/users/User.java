@@ -31,7 +31,7 @@ public class User extends SoftDeletetionEntity {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "role", columnDefinition = "VARCHAR(10) default 'USER'")
+    @Column(name = "role", columnDefinition = "VARCHAR(10)")
     private String role;
 
     @Builder.Default
