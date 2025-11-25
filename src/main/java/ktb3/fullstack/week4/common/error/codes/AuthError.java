@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum AuthError implements ErrorCode {
 
     INVALID_EMAIL_OR_PASSWORD(HttpStatus.UNAUTHORIZED, "invalid_email_or_password"),
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "invalid_access_token"),
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "access_token_expired"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "refresh_token_expired"),
     REFRESH_TOKEN_VALIDATION_FAIL(HttpStatus.UNAUTHORIZED, "refresh_token_validation_fail");

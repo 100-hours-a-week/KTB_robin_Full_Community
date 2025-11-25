@@ -8,10 +8,12 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,7 +47,6 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        token = decapsulate(token);
         Long userId = getUserIdFromAccessToken(token).
                 orElseThrow(() -> new JwtException("토큰에 회원 id가 없습니다."));
 
@@ -128,17 +129,12 @@ public class JwtTokenProvider {
 
     public Optional<String> resolveRefreshTokenFromCookies(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
-        if(cookies == null) return Optional.empty();
+        if (cookies == null) return Optional.empty();
         for (Cookie c : cookies) {
-            if(cookieName.equals(c.getName())) {
+            if (cookieName.equals(c.getName())) {
                 return Optional.ofNullable(c.getValue());
             }
         }
         return Optional.empty();
-    }
-
-    private String decapsulate(String capsulated) {
-        String[] arr = capsulated.split("\\[");
-        return arr[1].substring(0, arr[1].length()-1);
     }
 }
