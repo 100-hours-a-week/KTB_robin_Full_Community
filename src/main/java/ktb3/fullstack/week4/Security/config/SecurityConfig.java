@@ -4,7 +4,6 @@ import ktb3.fullstack.week4.Security.handler.CustomAccessDeniedHandler;
 import ktb3.fullstack.week4.Security.handler.CustomAuthenticationEntryPoint;
 import ktb3.fullstack.week4.Security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -57,13 +56,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/availability/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/app/**",
-                                "/css/**",
-                                "/html/**"
-                        ).permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        .requestMatchers("/app/**", "/css/**", "/html/**", "/assets/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

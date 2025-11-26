@@ -23,9 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다. ID: " + userId));
 
-        // 시큐리티 유저의 getAuthorities() 를 호출하면, 권한은 자동으로 들어갈 것인가
-        // 혹은 생성자에 user의 권한을 명시적으로 넣지 않았으므로 안들어갈 것인가.
-        // 당연히 후자겠죠?
         return new SecurityUser(user);
     }
 }

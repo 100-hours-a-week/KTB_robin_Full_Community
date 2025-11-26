@@ -29,7 +29,6 @@ public class ProfileImageService implements ImageService {
         try {
             image.transferTo(new File(profileImageUrl));
         } catch (IOException e) {
-            System.out.println("이미지 이동 중 문제 발생!");
             log.info("이미지 이동 중 문제 발생!");
         }
     }

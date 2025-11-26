@@ -2,9 +2,11 @@ package ktb3.fullstack.week4.dto.users;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class JoinRequest {
     @Email @NotBlank
     private String email;

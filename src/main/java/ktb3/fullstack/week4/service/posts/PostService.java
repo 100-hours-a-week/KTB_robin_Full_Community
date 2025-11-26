@@ -175,7 +175,6 @@ public class PostService {
             PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).get();
             primaryImageUrl = primaryImage.getImageUrl();
         } catch (NoSuchElementException e) {
-            System.out.println("사진이 없음");
             log.info("사진이 없음");
         }
 

@@ -14,7 +14,7 @@ public class UserDomainBuilder {
                 .email(dto.getEmail())
                 .hashedPassword(hashedPassword)
                 .nickname(dto.getNickname())
-                .role(Role.USER.toString())
+                .role(Role.ROLE_USER.toString())
                 .build();
     }
 

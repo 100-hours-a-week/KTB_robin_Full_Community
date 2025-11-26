@@ -1,7 +1,6 @@
 package ktb3.fullstack.week4.Security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
