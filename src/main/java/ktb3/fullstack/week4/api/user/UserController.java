@@ -40,7 +40,7 @@ public class UserController implements UserApi {
     public ApiResponse<UserEditPageResponse> getUserInfoForEditPage(
             @AuthenticationPrincipal SecurityUser user) {
             UserEditPageResponse result = userService.getUserInfoForEditPage(user.getId());
-        return ApiResponse.ok(result, "nickname_edit_success");
+        return ApiResponse.ok(result, "userinfo_fetch_success");
     }
 
     @Override
