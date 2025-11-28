@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)
         }
 )
-@AutoConfigureMockMvc(addFilters = false)
+@Import(UserControllerTest.TestSecurityConfig.class)
 public class UserControllerTest {
 
     @MockitoBean
