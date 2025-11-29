@@ -12,9 +12,6 @@ public class AppPasswordEncoder {
     private final PasswordEncoder passwordEncoder;
 
     public String encode(String rawPassword) {
-        if (rawPassword == null || rawPassword.isBlank()) {
-            throw new IllegalArgumentException("비밀번호는 비어있을 수 없습니다.");
-        }
         return passwordEncoder.encode(rawPassword);
     }
 
