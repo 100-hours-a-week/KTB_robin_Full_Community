@@ -121,7 +121,6 @@ public class UserService {
     // 회원 탈퇴
     @Transactional
     public void withdrawMemberShip(long userId) {
-        errorCheckService.checkCanNotFoundUser(userId);
         userDeleteFacade.deleteUser(userId); // 연관 데이터까지 모두 Soft Delete 적용하는 퍼사드
     }
 }
