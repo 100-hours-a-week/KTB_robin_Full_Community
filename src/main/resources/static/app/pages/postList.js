@@ -118,7 +118,7 @@ async function loadMore() {
             const vh = window.innerHeight || document.documentElement.clientHeight;
 
             if (rect.top <= vh + 50) {
-                loadMore();
+                await loadMore();
             }
         }
     }
