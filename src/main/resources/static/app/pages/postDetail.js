@@ -343,9 +343,11 @@ function renderComments(comments = [], currentUserName) {
         const isMine = currentUserName && c.author === currentUserName;
         const $edit = $node.querySelector(".btn-edit");
         const $remove = $node.querySelector(".btn-remove");
+        $edit.classList.add('hidden');
+        $remove.classList.add('hidden');
         if (isMine) {
-            $edit.hidden = false;
-            $remove.hidden = false;
+            $edit.classList.toggle('hidden');
+            $remove.classList.toggle('hidden');
 
             $edit.addEventListener("click", () => startEditComment(c.id, c.content));
             $remove.addEventListener("click", () => {
