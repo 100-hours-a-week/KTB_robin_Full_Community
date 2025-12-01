@@ -49,15 +49,19 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     }
 
     public void checkImageAvailability(MultipartFile image) {
-        final long MAX_SIZE = 10L * 1024 * 1024;
         if(image == null) {
             throw new ApiException(FileError.IMAGE_NOT_FOUND);
         }
+
+        final long MAX_SIZE = 10L * 1024 * 1024;
         if(image.getSize() > MAX_SIZE) {
             throw new ApiException(FileError.IMAGE_SIZE_TOO_BIG);
         }
-        // JPEG, PNG 만 받도록 처리 -> invalid file type
+
         String imageType = image.getContentType();
+        if(imageType == null) {
+            throw new ApiException(FileError.FILE_TYPE_OMITTED);
+        }
         if(!(imageType.equals("image/jpeg") || imageType.equals("image/png"))) {
             throw new ApiException(FileError.INVALID_FILE_TYPE);
         }
