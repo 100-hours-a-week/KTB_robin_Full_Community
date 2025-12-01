@@ -6,9 +6,10 @@ import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.repository.images.ProfileImageRepository;
 import ktb3.fullstack.week4.repository.users.UserRepository;
+import ktb3.fullstack.week4.service.availabilities.AvailabilityService;
+import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import ktb3.fullstack.week4.service.images.ImageDomainBuilder;
 import ktb3.fullstack.week4.service.images.ProfileImageService;
-import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class UserService {
     private final AppPasswordEncoder passwordEncoder;
 
     private final ErrorCheckServiceImpl errorCheckService;
+    private final AvailabilityService availabilityService;
     private final ProfileImageService profileImageService;
 
     private final UserRepository userRepository;
@@ -38,6 +40,8 @@ public class UserService {
 
     @Transactional
     public void register(JoinRequest dto, MultipartFile image) {
+        availabilityService.checkRegisterAvailability(dto, image);
+
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
         User user = userDomainBuilder.buildUser(hashedPassword, dto);
 
@@ -55,14 +59,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserEditPageResponse getUserInfoForEditPage(long userId) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
-        UserEditPageResponse dto = userDomainBuilder.buildUserPageResponse(user.getEmail(), user.getNickname());
-        return dto;
+        return userDomainBuilder.buildUserPageResponse(user.getEmail(), user.getNickname());
     }
 
     // 닉네임 변경: 존재 확인 → 저장소 갱신
     @Transactional
     public NicknameUpdateResponse changeNickname(long userId, NicknameUpdateRequest dto) {
         User user = errorCheckService.checkCanNotFoundUser(userId);
+        availabilityService.checkNewNicknameAvailability(dto);
         String newNickname = dto.getNewNickname();
         user.changeNickName(newNickname);
         return new NicknameUpdateResponse(newNickname);
