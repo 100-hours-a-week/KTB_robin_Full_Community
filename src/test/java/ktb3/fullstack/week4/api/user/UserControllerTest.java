@@ -10,7 +10,6 @@ import ktb3.fullstack.week4.common.error.codes.FileError;
 import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.dto.users.*;
-import ktb3.fullstack.week4.service.availabilities.AvailabilityService;
 import ktb3.fullstack.week4.service.users.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,9 +98,6 @@ public class UserControllerTest {
     UserService userService;
 
     @MockitoBean
-    AvailabilityService availabilityService;
-
-    @MockitoBean
     AppPasswordEncoder passwordEncoder;
 
     private MockMultipartFile createDtoFile() throws JsonProcessingException {
@@ -145,7 +141,6 @@ public class UserControllerTest {
         MockMultipartFile dtoFile = createDtoFile();
         MockMultipartFile imageFile = createImageFile();
 
-        doNothing().when(availabilityService).checkRegisterAvailability(any(), any());
         doNothing().when(userService).register(any(), any());
 
 
@@ -163,7 +158,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("register_success"))
                 .andDo(print());
 
-        verify(availabilityService).checkRegisterAvailability(any(JoinRequest.class), any());
         verify(userService).register(any(JoinRequest.class), any());
     }
 
@@ -175,7 +169,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(UserError.EXISTING_EMAIL))
-                .when(availabilityService).checkRegisterAvailability(any(), any());
+                .when(userService).register(any(), any());
 
         // when
         ResultActions result = mockMvc.perform(
@@ -198,7 +192,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(UserError.EXISTING_NICKNAME))
-                .when(availabilityService).checkRegisterAvailability(any(), any());
+                .when(userService).register(any(), any());
 
         // when
         ResultActions result = mockMvc.perform(
@@ -221,7 +215,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(FileError.IMAGE_SIZE_TOO_BIG))
-                .when(availabilityService).checkRegisterAvailability(any(), any());
+                .when(userService).register(any(), any());
 
         // when
         ResultActions result = mockMvc.perform(
@@ -244,7 +238,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(FileError.IMAGE_NOT_FOUND))
-                .when(availabilityService).checkRegisterAvailability(any(), any());
+                .when(userService).register(any(), any());
 
         // when
         ResultActions result = mockMvc.perform(
@@ -267,8 +261,8 @@ public class UserControllerTest {
         MockMultipartFile dtoFile = createDtoFile();
         MockMultipartFile imageFile = createImageFile();
 
-        doThrow(new ApiException(FileError.INVALID_FILE_TYPE)) // jpeg, png 가 아니라면 발생
-                .when(availabilityService).checkRegisterAvailability(any(), any());
+        doThrow(new ApiException(FileError.INVALID_FILE_TYPE)) // jpeg, png 가 아니라면 예외 발생
+                .when(userService).register(any(), any());
 
         // when
         ResultActions result = mockMvc.perform(
@@ -340,7 +334,6 @@ public class UserControllerTest {
         NicknameUpdateResponse expected = new NicknameUpdateResponse(newNickname);
 
         // [수정] 객체 참조값(Reference)이 다르므로 dto 대신 any() 매처를 사용해야 Mock이 정상 동작함
-        doNothing().when(availabilityService).checkNewNicknameAvailability(any(NicknameUpdateRequest.class));
         given(userService.changeNickname(eq(TEST_USER_ID), any(NicknameUpdateRequest.class)))
                 .willReturn(expected);
 
@@ -359,8 +352,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.data.newNickname").value(newNickname)) // 이제 data가 null이 아님
                 .andDo(print());
 
-        // 검증 시에도 any() 사용
-        verify(availabilityService).checkNewNicknameAvailability(any(NicknameUpdateRequest.class));
         verify(userService).changeNickname(eq(TEST_USER_ID), any(NicknameUpdateRequest.class));
     }
 
@@ -372,7 +363,7 @@ public class UserControllerTest {
         NicknameUpdateRequest dto = new NicknameUpdateRequest(newNickname);
 
         doThrow(new ApiException(UserError.EXISTING_NICKNAME))
-                .when(availabilityService).checkNewNicknameAvailability(any(NicknameUpdateRequest.class));
+                .when(userService).changeNickname(eq(TEST_USER_ID), any(NicknameUpdateRequest.class));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -411,7 +402,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("password_edit_success"))
                 .andDo(print());
 
-        // 검증 시에도 any() 사용
         verify(userService).changePassword(eq(TEST_USER_ID), any(PasswordUpdateRequest.class));
     }
 
