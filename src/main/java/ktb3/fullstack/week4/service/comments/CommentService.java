@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class CommentService {
@@ -45,19 +43,9 @@ public class CommentService {
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
 
-        // 존재/소유 확인을 위해 먼저 조회
-        List<Comment> comments = commentRepository.findAllByPostId(postId);
-        Comment target = null;
-        for (Comment comment : comments) {
-            if (comment.getId() == commentId) {
-                target = comment;
-                break;
-            }
-        }
+        Comment target = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(CommentError.CANNOT_FOUND_COMMENT));
 
-        if (target == null) {
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
         if (target.getUser().getId() != userId) {
             throw new ApiException(CommentError.CANNOT_EDIT_OTHERS_COMMENT);
         }
@@ -71,19 +59,9 @@ public class CommentService {
         errorCheckService.checkCanNotFoundUser(userId);
         errorCheckService.checkCanNotFoundPost(postId);
 
-        // 존재/소유 확인을 위해 먼저 조회
-        List<Comment> comments = commentRepository.findAllByPostId(postId);
-        Comment target = null;
-        for (Comment comment : comments) {
-            if (comment.getId() == commentId) {
-                target = comment;
-                break;
-            }
-        }
+        Comment target = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(CommentError.CANNOT_FOUND_COMMENT));
 
-        if (target == null) {
-            throw new ApiException(CommentError.CANNOT_FOUND_COMMENT);
-        }
         if (target.getUser().getId() != userId) {
             throw new ApiException(CommentError.CANNOT_DELETE_OTHERS_COMMENT);
         }
