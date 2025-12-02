@@ -141,7 +141,7 @@ public class UserControllerTest {
         MockMultipartFile dtoFile = createDtoFile();
         MockMultipartFile imageFile = createImageFile();
 
-        doNothing().when(userService).register(any(), any());
+        doNothing().when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
 
         // when
@@ -158,7 +158,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("register_success"))
                 .andDo(print());
 
-        verify(userService).register(any(JoinRequest.class), any());
+        verify(userService).register(any(JoinRequest.class), any(MultipartFile.class));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(UserError.EXISTING_EMAIL))
-                .when(userService).register(any(), any());
+                .when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -192,7 +192,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(UserError.EXISTING_NICKNAME))
-                .when(userService).register(any(), any());
+                .when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -215,7 +215,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(FileError.IMAGE_SIZE_TOO_BIG))
-                .when(userService).register(any(), any());
+                .when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -238,7 +238,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(FileError.IMAGE_NOT_FOUND))
-                .when(userService).register(any(), any());
+                .when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -262,7 +262,7 @@ public class UserControllerTest {
         MockMultipartFile imageFile = createImageFile();
 
         doThrow(new ApiException(FileError.INVALID_FILE_TYPE)) // jpeg, png 가 아니라면 예외 발생
-                .when(userService).register(any(), any());
+                .when(userService).register(any(JoinRequest.class), any(MultipartFile.class));
 
         // when
         ResultActions result = mockMvc.perform(
