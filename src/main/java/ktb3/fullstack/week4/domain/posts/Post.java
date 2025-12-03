@@ -26,8 +26,7 @@ import java.util.List;
 public class Post extends SoftDeletetionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Pageble 로 페이징 구현하기 전까지만 IDENTITY 사용
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NonNull

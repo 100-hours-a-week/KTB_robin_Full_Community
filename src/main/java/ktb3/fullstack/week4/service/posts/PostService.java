@@ -23,6 +23,10 @@ import ktb3.fullstack.week4.service.images.ImageDomainBuilder;
 import ktb3.fullstack.week4.service.images.PostImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +67,7 @@ public class PostService {
         PostView postView = postDomainBuilder.buildPostView(post);
         postViewRepository.save(postView);
 
-        if(image != null) {
+        if (image != null) {
             String postImageUrl = postImageService.makeImagePathString(image);
             postImageService.transferImageToLocalDirectory(image, postImageUrl);
 
@@ -79,51 +83,38 @@ public class PostService {
     public PostListResponse getPostList(long userId, int after, int limit) {
         errorCheckService.checkCanNotFoundUser(userId);
 
-        int from = after + 1;
-        int to = after + limit;
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "id"));
 
-        List<Post> page = postRepository.findAllByIdBetween((long) from, (long) to);
-        List<Post> next = postRepository.findAllByIdBetween((long) from + limit, (long) to + limit);
+        Slice<Post> postSlice = postRepository.findByIdGreaterThan((long) after, pageable);
 
-        /*
-            Pageble로 변경 전 임시방편
+        List<PostListResponse.PostBriefInfo> briefs = postSlice.getContent().stream()
+                .map(post -> {
+                    long postId = post.getId();
 
-            edge case : postId가 from ~ to 범위인 게시글 모두 삭제된 게시글이라면 오류발생
-        */
-        boolean hasNext = !next.isEmpty();
+                    long likes = likeRepository.countByPostId(postId);
+                    long comments = commentRepository.countByPostId(postId);
+                    long views = postViewRepository.viewCountByPostId(postId);
 
-        System.out.println("hasNext = " + hasNext);
+                    User author = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
+                    String authorName = author.getNickname();
+                    String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(author.getId()).getImageUrl();
 
-        List<PostListResponse.PostBriefInfo> briefs =   new ArrayList<>(page.size());
+                    return new PostListResponse.PostBriefInfo(
+                            post.getId(),
+                            post.getTitle(),
+                            likes,
+                            comments,
+                            views,
+                            authorName,
+                            authorProfileImageUrl,
+                            post.getModifiedAt()
+                    );
+                })
+                .toList();
 
+        int nextCursor = briefs.isEmpty() ? after : Math.toIntExact(briefs.getLast().getId());
 
-        for (Post post : page) {
-
-            long postId = post.getId();
-
-            long likes = likeRepository.countByPostId(postId);
-            long comments = commentRepository.countByPostId(postId);
-            long views = postViewRepository.viewCountByPostId(postId);
-
-            User author = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
-            String authorName = author.getNickname();
-            String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(author.getId()).getImageUrl();
-
-            briefs.add(new PostListResponse.PostBriefInfo(
-                    post.getId(),
-                    post.getTitle(),
-                    likes,
-                    comments,
-                    views,
-                    authorName,
-                    authorProfileImageUrl,
-                    post.getModifiedAt()
-            ));
-        }
-
-        int nextCursor = page.isEmpty() ? after : Math.toIntExact(page.getLast().getId());
-
-        return new PostListResponse(briefs, nextCursor, hasNext);
+        return new PostListResponse(briefs, nextCursor, postSlice.hasNext());
     }
 
     // 게시글 상세조회
