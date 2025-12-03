@@ -13,8 +13,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     void deleteById(Long id);
 
-    boolean existsByUserId(Long userId);
-
     long countByPostId(Long postId);
 
     List<Comment> findAllByPostId(Long postId);
