@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
     // 예기치 못한 오류 500 으로 일반화
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception e) {
+    public ResponseEntity<ApiResponse<Void>> handleUnexpected() {
         return ResponseEntity.
                 status(GenericError.INTERNAL_SERVER_ERROR.getStatus()).
                 body(ApiResponse.error(GenericError.INTERNAL_SERVER_ERROR.getMessage()));
