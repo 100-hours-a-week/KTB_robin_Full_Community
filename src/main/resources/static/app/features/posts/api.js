@@ -10,7 +10,7 @@ export async function fetchPosts({ after, limit }) {
 // 상세
 export async function fetchPostDetail(id) {
     const res = await apiJson(`/posts/${id}`);
-    return res?.data; // { post, is_liked, isOwner, comments }
+    return res?.data; // { post, is_liked, isOwner }
 }
 
 // 등록 (dto + image)
@@ -52,6 +52,12 @@ export async function addComment(postId, content) {
     await apiJson(`/posts/${postId}/comments${buildQuery({ content })}`, { method: "POST" });
     return true;
 }
+
+export async function fetchCommentList(postId, {modifiedBefore, cursorId, limit}) {
+    const res = await apiJson(`/posts/${postId}/comments${buildQuery({ modifiedBefore, cursorId, limit })}`);
+    return res?.data;
+}
+
 export async function editComment(postId, commentId, content) {
     await apiJson(`/posts/${postId}/comments/${commentId}${buildQuery({ content })}`, { method: "PATCH" });
     return true;

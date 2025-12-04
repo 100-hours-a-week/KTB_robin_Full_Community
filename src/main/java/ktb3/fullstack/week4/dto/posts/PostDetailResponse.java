@@ -18,9 +18,6 @@ public class PostDetailResponse {
 
     private boolean isOwner;
 
-    @JsonProperty("comments")
-    private List<CommentInfo> comments;
-
     @Getter
     @AllArgsConstructor
     public static class PostInfo {
@@ -43,17 +40,5 @@ public class PostDetailResponse {
 
         @JsonProperty("content")
         private String content;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class CommentInfo {
-        private long id;
-        private String author;
-        private String content;
-        private String authorProfileImageUrl;
-
-        @JsonProperty("modified_at")
-        private LocalDateTime modifiedAt;
     }
 }

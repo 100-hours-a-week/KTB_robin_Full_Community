@@ -6,11 +6,19 @@ import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.users.User;
+import ktb3.fullstack.week4.dto.posts.CommentListResponse;
 import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.service.errors.ErrorCheckServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +39,35 @@ public class CommentService {
         Comment comment = commentDomainBuilder.buildComment(user, post, content);
         comment.linkPost(post);
         commentRepository.save(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public CommentListResponse getCommentList(long userId, long postId, String modifiedBefore, Long cursorId, int limit) {
+        errorCheckService.checkCanNotFoundUser(userId);
+
+        LocalDateTime time;
+        if (modifiedBefore == null || cursorId == null) {
+            time = LocalDateTime.now().plusYears(100);
+            cursorId = Long.MAX_VALUE;
+        } else {
+            time = LocalDateTime.parse(modifiedBefore, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        Pageable pageable = PageRequest.of(0, limit);
+
+        Slice<Comment> commentSlice = commentRepository.findByModifiedAtLessThan(time, postId, cursorId, pageable);
+        List<CommentListResponse.CommentInfo> commentInfos = commentSlice.getContent().stream()
+                .map(comment -> new CommentListResponse.CommentInfo(
+                        comment.getId(),
+                        comment.getUser().getNickname(),
+                        comment.getContent(),
+                        comment.getUser().getProfileImages().getFirst().getImageUrl(),
+                        comment.getModifiedAt()
+                )).toList();
+
+        Long nextCursorId = commentInfos.isEmpty() ? null : commentInfos.getLast().getId();
+
+        return new CommentListResponse(commentInfos, nextCursorId, commentSlice.hasNext());
     }
 
     // 댓글 수정

@@ -1,6 +1,7 @@
 // 상세 페이지 스크립트
 import {
     fetchPostDetail,
+    fetchCommentList,
     removePost,
     likePost,
     unlikePost,
@@ -46,12 +47,27 @@ const $commentTextarea = document.getElementById("comment");
 const $commentSubmit = document.getElementById("commentSubmitBtn");
 const $commentList = document.querySelector(".comment-list");
 
+// 댓글 무한 스크롤을 위한 Sentinel (스크롤 감지 요소)
+const $commentSentinel = document.createElement("div");
+$commentSentinel.id = "comment-sentinel";
+$commentSentinel.style.height = "20px";
+$commentSentinel.style.margin = "10px 0";
+// 댓글 리스트 바로 뒤에 삽입하기 위해 부모 요소에 append (DOM 로드 후 init에서 처리)
+
 // 상태
 let isLiked = false;
 let isOwner = false;
 let likeCount = 0;
 let viewCount = 0;
 let commentCount = 0;
+
+const COMMENT_LIMIT = 10;
+
+// 댓글 페이징 상태
+let commentCursorId = null;
+let commentCursorTime = null; // modifiedBefore 파라미터용
+let commentHasNext = true;
+let isCommentLoading = false;
 
 // 현재 로그인한 사용자 닉네임 (비로그인 시 null)
 let currentUserNickname = null;
@@ -202,33 +218,51 @@ function ensureCommentTemplate() {
 let likeInFlight = false;
 
 // 서버 응답을 상태에 적용하고 화면을 갱신하는 헬퍼
-function applyServerState(data = {}) {
-    const post = data.post || {};
-    const comments = Array.isArray(data.comments) ? data.comments : [];
+function applyServerState(postData, commentData) {
+    const post = postData?.post || {};
+    // 댓글 데이터 처리는 loadMoreComments 흐름으로 통합하므로 여기서는 Post 정보만 업데이트
+    // 단, 초기 로딩 시점의 댓글 개수 등은 반영
 
-    const likedFlag = data.liked ?? false;
-    const ownerFlag = data.owner ?? false;
+    const likedFlag = postData?.liked ?? false;
+    const ownerFlag = postData?.owner ?? false;
 
     isLiked = Boolean(likedFlag);
     isOwner = Boolean(ownerFlag);
-    likeCount = Number(post?.likeCount ?? 0);
-    viewCount = Number(post?.viewCount ?? 0);
-    commentCount = Number(post?.commentCount ?? comments.length ?? 0);
+    likeCount = Number(post.likeCount ?? 0);
+    viewCount = Number(post.viewCount ?? 0);
+    // 전체 댓글 수는 Post 정보에 포함된 commentCount를 사용 (댓글 목록 slice의 길이가 아님)
+    commentCount = Number(post.commentCount ?? 0);
 
     // 본문/이미지만 렌더 (카운트는 상태값 기준으로 renderCounts에서 처리)
     renderPost(post);
     renderCounts();
-    // 댓글의 수정/삭제 버튼 노출은 '현재 로그인 유저' 기준으로 판단해야 함
-    renderComments(comments, currentUserNickname);
-
+    
     updateOwnerControls(isOwner);
 
     if ($container) $container.hidden = false;
 }
 
+// 댓글 목록 초기화 및 첫 페이지 로드
+async function refreshComments() {
+    commentCursorId = null;
+    commentCursorTime = null;
+    commentHasNext = true;
+    isCommentLoading = false;
+    $commentList.innerHTML = ""; // 목록 비우기
+    
+    await loadMoreComments();
+}
+
 async function refreshPostState() {
-    const data = await fetchPostDetail(postId);
-    applyServerState(data);
+    // 게시글 상세 정보 조회
+    const postData = await fetchPostDetail(postId);
+    
+    // 댓글 목록은 별도 초기화 함수로 관리
+    // postData만 적용
+    applyServerState(postData, null); 
+
+    // 댓글 새로고침 (첫 페이지 로드)
+    await refreshComments();
 }
 
 async function loadCurrentUserNickname() {
@@ -250,8 +284,9 @@ async function toggleLike() {
         } else {
             await likePost(postId);
         }
-        // 서버에서 정확한 최신 상태로 재동기화
-        await refreshPostState();
+        // 좋아요 토글 시에는 게시글 정보(좋아요 수)만 갱신하면 됨
+        const postData = await fetchPostDetail(postId);
+        applyServerState(postData, null);
     } catch (e) {
         console.error(e);
     } finally {
@@ -325,7 +360,8 @@ function renderComments(comments = [], currentUserName) {
     ensureCommentTemplate();
     const $tpl = document.getElementById("comment-item-template");
 
-    $commentList.innerHTML = ""; // 초기화
+    // 주의: append 방식이므로 innerHTML 초기화는 refreshComments()에서 수행함.
+    
     comments.forEach((c) => {
         const $node = $tpl.content.firstElementChild.cloneNode(true);
         $node.dataset.id = String(c.id);
@@ -356,7 +392,7 @@ function renderComments(comments = [], currentUserName) {
                     message: "삭제한 내용은 복구 할 수 없습니다.",
                     onConfirm: async () => {
                         await removeComment(postId, c.id);
-                        await boot(); // 새로고침 대신 재로드
+                        await refreshPostState(); // 삭제 후 갱신
                     },
                 });
             });
@@ -364,6 +400,78 @@ function renderComments(comments = [], currentUserName) {
 
         $commentList.appendChild($node);
     });
+}
+
+// 댓글 더 불러오기 (무한 스크롤)
+async function loadMoreComments() {
+    if (isCommentLoading || !commentHasNext) return;
+    isCommentLoading = true;
+
+    try {
+        // API 파라미터 준비
+        // CommentService는 modifiedBefore(String "yyyy-MM-dd HH:mm:ss")와 cursorId(Long)를 받음
+        const params = {
+            limit: COMMENT_LIMIT,
+            cursorId: commentCursorId,
+            modifiedBefore: commentCursorTime // null이면 서버가 최신값 처리
+        };
+
+        const data = await fetchCommentList(postId, params);
+        const comments = data?.comments ?? [];
+        
+        // 화면에 추가
+        renderComments(comments, currentUserNickname);
+
+        // 다음 커서 업데이트
+        commentHasNext = Boolean(data?.has_next);
+        commentCursorId = data?.next_cursor_id ?? null;
+
+        // 다음 modifiedBefore를 위해 마지막 댓글의 시간을 가져옴
+        // 서버 포맷에 맞춰 "yyyy-MM-dd HH:mm:ss" 변환 필요
+        if (comments.length > 0) {
+            const lastComment = comments[comments.length - 1];
+            // lastComment.modified_at은 "2024-12-04T10:00:00" 형태의 ISO string이라고 가정
+            if (lastComment.modified_at) {
+                commentCursorTime = String(lastComment.modified_at).replace("T", " ").slice(0, 19);
+            }
+        }
+
+    } catch (e) {
+        console.error("Failed to load comments:", e);
+    } finally {
+        isCommentLoading = false;
+        
+        // 로딩 후에도 남은 데이터가 있고, Sentinel이 화면에 보인다면 즉시 추가 로드 (화면이 큰 경우 대비)
+        if (commentHasNext && $commentSentinel) {
+            const rect = $commentSentinel.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            if (rect.top <= vh + 50) {
+                 await loadMoreComments();
+            }
+        }
+    }
+}
+
+function setupCommentInfiniteScroll() {
+    // Sentinel을 댓글 리스트 다음에 삽입
+    if ($commentList && $commentList.parentNode) {
+        $commentList.parentNode.insertBefore($commentSentinel, $commentList.nextSibling);
+    }
+
+    const io = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                if (!commentHasNext || isCommentLoading) return;
+                loadMoreComments();
+            });
+        },
+        {
+            rootMargin: "100px", // 조금 미리 로드
+            threshold: 0
+        }
+    );
+    io.observe($commentSentinel);
 }
 
 function setSubmitEnabled(enabled) {
@@ -437,7 +545,7 @@ $commentSubmit?.addEventListener("click", async () => {
         $commentTextarea.value = "";
         setSubmitEnabled(false);
 
-        await boot(); // 최신 상태 재로딩
+        await refreshPostState(); // 댓글 등록/수정 후 전체 갱신 (댓글 목록 리셋 포함)
     } catch (e) {
         console.error(e);
     }
@@ -449,6 +557,9 @@ async function boot() {
 
     try {
         await loadCurrentUserNickname();
+        // 무한 스크롤 설정
+        setupCommentInfiniteScroll();
+        
         await refreshPostState();
     } catch (e) {
         console.error(e);

@@ -9,12 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.Security.context.SecurityUser;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
-import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
-import ktb3.fullstack.week4.dto.posts.PostEditRequest;
-import ktb3.fullstack.week4.dto.posts.PostListResponse;
-import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
+import ktb3.fullstack.week4.dto.posts.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "[게시글 API]")
@@ -135,21 +134,6 @@ public interface PostApi {
                                           },
                                           "liked": false,
                                           "owner": false,
-                                          "comments": [
-                                                {
-                                                    "id": 1,
-                                                    "author": "bluer",
-                                                    "content": "good posting",
-                                                    "modified_at": "2025-10:02T20:30:15+09:00"
-                                                },
-                                                {
-                                                    "id": 2,
-                                                    "author": "brian",
-                                                    "content": "awesome posting",
-                                                    "modified_at": "2025-10:01T20:30:15+09:00"
-                                                },
-                                                . . .
-                                          ]
                                      }
                                  }
                                 """),
@@ -404,6 +388,46 @@ public interface PostApi {
                 @Parameter(hidden = true) @AuthenticationPrincipal SecurityUser user,
                 @PathVariable("postId") long postId,
                 @RequestParam("content") String content
+        );
+
+        @Operation(summary = "게시글의 댓글 목록 조회", description = "게시글에 달린 댓글 목록을 가져옵니다.")
+        @ApiResponses(value = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "200",
+                        content = @Content(mediaType = "application/json", examples = {
+                                @ExampleObject(name = "댓글 목록 조회 성공", value = """
+                                        {
+                                            "message" : "comments_fetch_success",
+                                            "data" : {
+                                                "comments": [
+                                                    {
+                                                        "id": 1,
+                                                        "author": "bluer",
+                                                        "content": "good posting",
+                                                        "modified_at": "2025-10:02T20:30:15+09:00"
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "author": "brian",
+                                                        "content": "awesome posting",
+                                                        "modified_at": "2025-10:01T20:30:15+09:00"
+                                                    },
+                                                    . . .
+                                                ],
+                                                "next_cursor": 6,  // 클라이언트에서 after의 값을 next_cursor-1 로 보내야합니다.
+                                                "has_next": true
+                                            }
+                                        }
+                                        """)
+                        })
+                )
+        })
+        ApiResponse<CommentListResponse> getCommentList(
+                @Parameter(hidden = true) @AuthenticationPrincipal SecurityUser user,
+                @PathVariable("postId") long postId,
+                @RequestParam(value = "modifiedBefore", required = false) String modifiedBefore,
+                @RequestParam(value = "cursorId", required = false) Long cursorId,
+                @RequestParam(value = "limit") int limits
         );
 
         @ApiResponses(value = {

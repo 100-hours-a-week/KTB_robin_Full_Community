@@ -1,11 +1,10 @@
 package ktb3.fullstack.week4.service.posts;
 
-import ktb3.fullstack.week4.common.error.codes.*;
+import ktb3.fullstack.week4.common.error.codes.GenericError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.posts.Post;
-import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.posts.PostView;
 import ktb3.fullstack.week4.domain.users.User;
 import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
@@ -146,21 +145,6 @@ public class PostService {
 
         boolean isOwner = post.getUser().getId() == userId;
 
-        // 댓글 상세 목록 조회 + dto 매핑
-        List<Comment> commentEntities = commentRepository.findAllByPostId(postId);
-        List<PostDetailResponse.CommentInfo> comments = new ArrayList<>();
-        for (Comment comment : commentEntities) {
-            String commentAuthorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(comment.getUser().getId()).getImageUrl();
-            comments.add(new PostDetailResponse.CommentInfo(
-                            comment.getId(),
-                            comment.getUser().getNickname(),
-                            comment.getContent(),
-                            commentAuthorProfileImageUrl,
-                            comment.getModifiedAt()
-                    )
-            );
-        }
-
         String primaryImageUrl = "";
         try {
             PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).get();
@@ -189,7 +173,7 @@ public class PostService {
                 post.getContent()
         );
 
-        return new PostDetailResponse(postInfo, isLiked, isOwner, comments);
+        return new PostDetailResponse(postInfo, isLiked, isOwner);
     }
 
     @Transactional
