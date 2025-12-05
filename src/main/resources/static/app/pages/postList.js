@@ -22,9 +22,7 @@ function truncate(text, max) {
 
 function formatDateTime(isoLike) {
     if (!isoLike) return "";
-    // 서버는 "yyyy-MM-ddTHH:mm:ss" 형태를 반환한다고 가정
-    // 요구 포맷: "yyyy-mm-dd hh:mm:ss"
-    return String(isoLike).replace("T", " ").slice(0, 19);
+    return String(isoLike).replace("T", " ").slice(0, 26);
 }
 
 function formatCount(n) {

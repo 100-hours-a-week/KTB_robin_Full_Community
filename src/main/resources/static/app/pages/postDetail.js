@@ -1,13 +1,13 @@
 // 상세 페이지 스크립트
 import {
-    fetchPostDetail,
-    fetchCommentList,
-    removePost,
-    likePost,
-    unlikePost,
     addComment,
     editComment,
+    fetchCommentList,
+    fetchPostDetail,
+    likePost,
     removeComment,
+    removePost,
+    unlikePost,
 } from "../features/posts/api.js";
 import {fetchMyEditInfo} from "../features/users/api.js";
 import {setAvatar} from "../components/Avatar.js";
@@ -82,7 +82,7 @@ function kCount(n) {
 }
 
 function fmt(iso) {
-    return String(iso || "").replace("T", " ").slice(0, 19);
+    return String(iso || "").replace("T", " ").slice(0, 26);
 }
 
 function lockScroll(lock) {
@@ -427,12 +427,12 @@ async function loadMoreComments() {
         commentCursorId = data?.next_cursor_id ?? null;
 
         // 다음 modifiedBefore를 위해 마지막 댓글의 시간을 가져옴
-        // 서버 포맷에 맞춰 "yyyy-MM-dd HH:mm:ss" 변환 필요
+        // 서버 포맷에 맞춰 "yyyy-MM-dd HH:mm:ss.SSSSSS" 변환 필요
         if (comments.length > 0) {
             const lastComment = comments[comments.length - 1];
             // lastComment.modified_at은 "2024-12-04T10:00:00" 형태의 ISO string이라고 가정
             if (lastComment.modified_at) {
-                commentCursorTime = String(lastComment.modified_at).replace("T", " ").slice(0, 19);
+                commentCursorTime = String(lastComment.modified_at).replace("T", " ").slice(0, 26);
             }
         }
 
