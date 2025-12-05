@@ -3,6 +3,7 @@ package ktb3.fullstack.week4.service.comments;
 import ktb3.fullstack.week4.common.error.codes.CommentError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
+import ktb3.fullstack.week4.common.util.CustomDateTimeFormatter;
 import ktb3.fullstack.week4.domain.comments.Comment;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.users.User;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,6 +29,8 @@ public class CommentService {
     private final ErrorCheckServiceImpl errorCheckService;
 
     private final CommentRepository commentRepository;
+
+    private final CustomDateTimeFormatter customDateTimeFormatter;
 
 
     // 댓글 등록
@@ -50,7 +52,7 @@ public class CommentService {
             time = LocalDateTime.now().plusYears(100);
             cursorId = Long.MAX_VALUE;
         } else {
-            time = LocalDateTime.parse(modifiedBefore, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            time = customDateTimeFormatter.format(modifiedBefore);
         }
 
         Pageable pageable = PageRequest.of(0, limit);
@@ -65,7 +67,7 @@ public class CommentService {
                         comment.getModifiedAt()
                 )).toList();
 
-        Long nextCursorId = commentInfos.isEmpty() ? null : commentInfos.getLast().getId();
+        Long nextCursorId = commentInfos.isEmpty() ? null : commentInfos.getLast().getId()-1;
 
         return new CommentListResponse(commentInfos, nextCursorId, commentSlice.hasNext());
     }
