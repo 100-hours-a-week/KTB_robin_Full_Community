@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class PostDetailResponse {
+public class PostDetailResponse implements Serializable {
 
     @JsonProperty("post")
     private PostInfo post;
@@ -20,7 +21,7 @@ public class PostDetailResponse {
 
     @Getter
     @AllArgsConstructor
-    public static class PostInfo {
+    public static class PostInfo implements Serializable {
         private long id;
         private String title;
         private long likeCount;
