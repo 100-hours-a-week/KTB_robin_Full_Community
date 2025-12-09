@@ -1,16 +1,15 @@
 package ktb3.fullstack.week4.service.posts;
 
+import ktb3.fullstack.week4.common.error.codes.FileError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
+import ktb3.fullstack.week4.common.error.codes.PostError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
 import ktb3.fullstack.week4.domain.images.PostImage;
 import ktb3.fullstack.week4.domain.posts.Post;
 import ktb3.fullstack.week4.domain.posts.PostView;
 import ktb3.fullstack.week4.domain.users.User;
-import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
-import ktb3.fullstack.week4.dto.posts.PostEditRequest;
-import ktb3.fullstack.week4.dto.posts.PostListResponse;
-import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
+import ktb3.fullstack.week4.dto.posts.*;
 import ktb3.fullstack.week4.repository.comments.CommentRepository;
 import ktb3.fullstack.week4.repository.images.PostImageRepository;
 import ktb3.fullstack.week4.repository.images.ProfileImageRepository;
@@ -30,9 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -86,15 +83,18 @@ public class PostService {
 
         Slice<Post> postSlice = postRepository.findByIdGreaterThan((long) after, pageable);
 
+        // 일반적으로 말하는 N+1 문제는 아니지만, 필요한 데이터에 비해 너무 많은 쿼리가 나가는중.
+        // 이제 Slice 사이즈가 m개 라면, likes, comments, views, user, userImage 를 가져오기 위한 쿼리 5종이 m번씩 발생하게됨
+        // 1 + m*5 번의 쿼리가 발생 : 분명 개선할 필요가 있는 문제.
         List<PostListResponse.PostBriefInfo> briefs = postSlice.getContent().stream()
                 .map(post -> {
                     long postId = post.getId();
 
                     long likes = likeRepository.countByPostId(postId);
                     long comments = commentRepository.countByPostId(postId);
-                    long views = postViewRepository.viewCountByPostId(postId);
+                    long views = post.getPostView().getViewCount();
 
-                    User author = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
+                    User author = post.getUser();
                     String authorName = author.getNickname();
                     String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(author.getId()).getImageUrl();
 
@@ -121,56 +121,39 @@ public class PostService {
     public PostDetailResponse getSinglePostDeatil(long userId, long postId) {
         errorCheckService.checkCanNotFoundUser(userId);
 
-        if (postId <= 0) {
+        if (postId <= 0) { // 컨트롤러 단에서 @Valid로 검증하도록 수정 필요
             throw new ApiException(GenericError.INVALID_REQUEST);
         }
 
-        Post post = errorCheckService.checkCanNotFoundPost(postId);
+        PostDetailDto dto = postRepository.findPostDetailByIdAndUserId(postId, userId)
+                .orElseThrow(() -> new ApiException(PostError.CANNOT_FOUND_POST));
 
-        // 조회 수 증가
-        PostView postView = post.getPostView();
-        postView.plusViewCount();
+        postViewRepository.findById(postId).ifPresent(PostView::plusViewCount);
 
-        User authorEntity = errorCheckService.checkCanNotFoundUser(post.getUser().getId());
-        String author = authorEntity.getNickname();
-        String authorProfileImageUrl = profileImageRepository.findByUserIdAndIsPrimaryIsTrue(authorEntity.getId()).getImageUrl();
-
-        // 숫자 정보
-        long likes = likeRepository.countByPostId(postId);
-        long commentsCount = commentRepository.countByPostId(postId);
-        long views = postViewRepository.viewCountByPostId(postId);
-
-        // (사용자 - 현재 조회중인 게시물) 좋아요 누름 여부
         boolean isLiked = likeRepository.existsByPostIdAndUserIdAndIsLikedTrue(postId, userId);
 
-        boolean isOwner = post.getUser().getId() == userId;
+        String primaryImageUrl = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId)
+                .map(PostImage::getImageUrl)
+                .orElseThrow(() -> new ApiException(FileError.IMAGE_NOT_FOUND));
 
-        String primaryImageUrl = "";
-        try {
-            PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).get();
-            primaryImageUrl = primaryImage.getImageUrl();
-        } catch (NoSuchElementException e) {
-            log.info("사진이 없음");
-        }
+        List<String> restImageUrls = postImageRepository.findAllNotPrimaryPostImages(postId)
+                .stream().map(PostImage::getImageUrl)
+                .toList();
 
-        List<PostImage> restImages = postImageRepository.findAllNotPrimaryPostImages(postId);
-        List<String> restImageUrls = new ArrayList<>();
-        for (PostImage postImage : restImages) {
-            restImageUrls.add(postImage.getImageUrl());
-        }
+        boolean isOwner = dto.getAuthorId() == userId;
 
         PostDetailResponse.PostInfo postInfo = new PostDetailResponse.PostInfo(
-                post.getId(),
-                post.getTitle(),
-                likes,
-                commentsCount,
-                views,
-                author,
-                authorProfileImageUrl,
-                post.getModifiedAt(),
+                dto.getId(),
+                dto.getTitle(),
+                dto.getLikeCount(),
+                dto.getCommentCount(),
+                dto.getViewCount() + 1,
+                dto.getAuthorNickname(),
+                dto.getAuthorProfileImageUrl(),
+                dto.getModifiedAt(),
                 primaryImageUrl,
                 restImageUrls,
-                post.getContent()
+                dto.getContent()
         );
 
         return new PostDetailResponse(postInfo, isLiked, isOwner);
