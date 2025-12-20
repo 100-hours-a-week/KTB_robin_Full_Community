@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.Optional;
 
 
 @Component
@@ -25,28 +26,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public static final String EMPTY_TOKEN = "Optional.empty";
-
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
 
         try {
-            String token = String.valueOf(tokenProvider.resolveAccessTokenFromAuthorization(request));
-            String tokenValue = decapsulate(token);
+            Optional<String> tokenValue = tokenProvider.resolveAccessTokenFromAuthorization(request);
 
             if(tokenValue.isEmpty()) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if(!tokenProvider.validateAccessToken(tokenValue)) {
+            if(!tokenProvider.validateToken(tokenValue.get())) {
                 throw new BadCredentialsException("Invalid or expired JWT token");
             }
 
             // 유효한 토큰이라면 인증객체를 생성 -> SecurityContext 에 저장
-            Authentication authentication = tokenProvider.getAuthentication(tokenValue);
+            Authentication authentication = tokenProvider.getAuthentication(tokenValue.get());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
@@ -80,12 +78,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return false;
-    }
-
-    // Optional 로 래핑된 문자열에서 토큰 value 만 추출
-    private String decapsulate(String capsulated) {
-        if(capsulated.equals(EMPTY_TOKEN)) return "";
-        String[] arr = capsulated.split("\\[");
-        return arr[1].substring(0, arr[1].length()-1);
     }
 }
