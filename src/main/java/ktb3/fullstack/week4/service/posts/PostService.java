@@ -1,5 +1,6 @@
 package ktb3.fullstack.week4.service.posts;
 
+import ktb3.fullstack.week4.common.error.codes.FileError;
 import ktb3.fullstack.week4.common.error.codes.GenericError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
 import ktb3.fullstack.week4.domain.SoftDeletetionEntity;
@@ -32,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -145,13 +145,10 @@ public class PostService {
 
         boolean isOwner = post.getUser().getId() == userId;
 
-        String primaryImageUrl = "";
-        try {
-            PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).get();
-            primaryImageUrl = primaryImage.getImageUrl();
-        } catch (NoSuchElementException e) {
-            log.info("사진이 없음");
-        }
+
+        PostImage primaryImage = postImageRepository.findByPostIdAndIsPrimaryIsTrue(postId).
+                orElseThrow(() -> new ApiException(FileError.IMAGE_NOT_FOUND));
+        String primaryImageUrl = primaryImage.getImageUrl();
 
         List<PostImage> restImages = postImageRepository.findAllNotPrimaryPostImages(postId);
         List<String> restImageUrls = new ArrayList<>();
