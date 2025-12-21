@@ -13,6 +13,7 @@ import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.users.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.charset.StandardCharsets;
 
 import static ktb3.fullstack.week4.context.WithMockCustomUser.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -143,7 +145,23 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("register_success"))
                 .andDo(print());
 
-        verify(userService).register(any(JoinRequest.class), any(MultipartFile.class));
+        // 1. ArgumentCaptor 생성
+        ArgumentCaptor<JoinRequest> joinRequestCaptor = ArgumentCaptor.forClass(JoinRequest.class);
+        ArgumentCaptor<MultipartFile> multipartFileCaptor = ArgumentCaptor.forClass(MultipartFile.class);
+
+        // 2. verify 단계에서 capture() 호출하여 인자 포획
+        verify(userService).register(joinRequestCaptor.capture(), multipartFileCaptor.capture());
+
+        // 3. 캡처된 값 검증
+        JoinRequest capturedRequest = joinRequestCaptor.getValue();
+        MultipartFile capturedFile = multipartFileCaptor.getValue();
+
+        // createDtoFile() 에서 설정한 값과 일치하는지 확인
+        assertEquals("yongsu626@naver.com", capturedRequest.getEmail());
+        assertEquals("robin123", capturedRequest.getNickname());
+        
+        // createImageFile() 에서 설정한 값과 일치하는지 확인
+        assertEquals("profile.jpeg", capturedFile.getOriginalFilename());
     }
 
     @Test
@@ -166,6 +184,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("existing_email"))
                 .andDo(print());
     }
 
@@ -189,6 +208,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("existing_nickname"))
                 .andDo(print());
     }
 
@@ -212,6 +232,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("image_size_too_big"))
                 .andDo(print());
     }
 
@@ -235,6 +256,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("image_not_found"))
                 .andDo(print());
     }
 
@@ -259,6 +281,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("invalid_file_type"))
                 .andDo(print());
     }
 
@@ -361,6 +384,7 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("existing_nickname"))
                 .andDo(print());
     }
 
@@ -408,6 +432,7 @@ public class UserControllerTest {
 
         // then : GlobalExceptionHandler 에서 MethodArgumentNotValidException 예외를 처리하여 400 응답을 반환한다
         result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("invalid_request"))
                 .andDo(print());
     }
 
