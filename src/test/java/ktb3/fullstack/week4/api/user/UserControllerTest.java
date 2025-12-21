@@ -13,6 +13,8 @@ import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.users.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -388,7 +390,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void change_password_success() throws Exception {
         // given
-        String newPassword = "newPassword123";
+        String newPassword = "newPassword123!";
         PasswordUpdateRequest dto = new PasswordUpdateRequest(newPassword);
 
         doNothing().when(userService).changePassword(eq(TEST_USER_ID), any(PasswordUpdateRequest.class));
@@ -412,13 +414,20 @@ public class UserControllerTest {
         assertEquals(newPassword, capturedDto.getNewPassword());
     }
 
-    @Test
-    @DisplayName("회원 비밀번호 수정 실패 : 비어있는 비밀번호로 요청을 보낼경우, @Valid 조건을 통과하지 못하여 400 BAD_REQUEST 와 에러 메시지를 반환한다")
+    @DisplayName("회원 비밀번호 수정 실패 : 유효하지 않은 비밀번호 패턴으로 요청 시 400 BAD_REQUEST 반환")
     @WithMockCustomUser
-    void change_password_fail() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "",                 // 비어있음
+            "short",            // 8자 미만
+            "tooLongpasswordisnotallowedhere123!", // 20자 초과
+            "onlylowercase1!",  // 대문자 없음
+            "ONLYUPPERCASE1!",  // 소문자 없음
+            "NoSpecialChar123", // 특수문자 없음
+    })
+    void change_password_fail(String invalidPassword) throws Exception {
         // given
-        String newPassword = "";
-        PasswordUpdateRequest dto = new PasswordUpdateRequest(newPassword);
+        PasswordUpdateRequest dto = new PasswordUpdateRequest(invalidPassword);
 
         // when
         ResultActions result = mockMvc.perform(
@@ -427,7 +436,7 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(dto))
         );
 
-        // then : GlobalExceptionHandler 에서 MethodArgumentNotValidException 예외를 처리하여 400 응답을 반환한다
+        // then
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("invalid_request"))
                 .andDo(print());
