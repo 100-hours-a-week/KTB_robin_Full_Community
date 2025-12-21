@@ -3,12 +3,12 @@ package ktb3.fullstack.week4.api.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ktb3.fullstack.week4.Security.config.SecurityConfig;
-import ktb3.fullstack.week4.Security.context.SecurityUser;
 import ktb3.fullstack.week4.Security.jwt.JwtAuthenticationFilter;
 import ktb3.fullstack.week4.Security.service.AppPasswordEncoder;
 import ktb3.fullstack.week4.common.error.codes.FileError;
 import ktb3.fullstack.week4.common.error.codes.UserError;
 import ktb3.fullstack.week4.common.error.exception.ApiException;
+import ktb3.fullstack.week4.context.WithMockCustomUser;
 import ktb3.fullstack.week4.dto.users.*;
 import ktb3.fullstack.week4.service.users.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,6 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,15 +31,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
 
+import static ktb3.fullstack.week4.context.WithMockCustomUser.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -57,12 +55,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(UserControllerTest.TestSecurityConfig.class)
 public class UserControllerTest {
 
-    private static final Long TEST_USER_ID = 1L;
-    private static final String TEST_USER_EMAIL = "dummy123@snaver.com";
-    private static final String TEST_USER_PASSWORD = "dummyPassword123";
-    private static final String TEST_USER_NICKNAME = "dummyNickname123";
-    private static final String TEST_USER_ROLE = "ROLE_USER";
-
     @TestConfiguration
     @EnableWebSecurity
     static class TestSecurityConfig { // @AuthenticationPrincipal 작동을 위한 최소 설정 정의
@@ -70,19 +62,12 @@ public class UserControllerTest {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             return http.csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                    .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/login", "/availability/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .anyRequest().authenticated())
                     .build();
         }
-    }
-
-    /**
-     * 인증된 사용자를 MockMvc 요청에 주입하기 위한 헬퍼 메서드
-     */
-    private RequestPostProcessor mockUser() {
-        SecurityUser securityUser = new SecurityUser(
-                TEST_USER_ID, TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_NICKNAME, TEST_USER_ROLE
-        );
-        return authentication(new UsernamePasswordAuthenticationToken(securityUser, null, securityUser.getAuthorities()));
     }
 
     @MockitoBean
@@ -280,6 +265,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 정보 (email, nickname) 가져오기 성공 : 인증된 사용자가 정보 가져오기 API를 호출하면 200 OK 와 데이터(email, nickname)를 반환한다")
+    @WithMockCustomUser
     void get_user_info_success() throws Exception {
         // given
         UserEditPageResponse response = new UserEditPageResponse(TEST_USER_EMAIL, TEST_USER_NICKNAME);
@@ -288,7 +274,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 get("/users/me")
-                        .with(mockUser())
                         .with(csrf())
         );
 
@@ -305,6 +290,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원탈퇴 성공 : 인증된 사용자가 탈퇴 API를 호출하면 UserSerivce 의 withdrawMemberShip 메소드를 호출하고, 200 OK 를 반환한다")
+    @WithMockCustomUser
     void withdraw_membership_success() throws Exception {
         // given
         doNothing().when(userService).withdrawMemberShip(TEST_USER_ID);
@@ -312,7 +298,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 delete("/users/me")
-                        .with(mockUser())
                         .with(csrf())
         );
 
@@ -327,6 +312,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 닉네임 수정 성공 : 닉네임 수정에 성공하면 200 OK 와 함께, 새로운 닉네임과 성공 메시지를 응답받는다")
+    @WithMockCustomUser
     void change_nickname_success() throws Exception {
         // given
         String newNickname = "newNickname123";
@@ -340,7 +326,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 patch("/users/me/nickname")
-                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf())
@@ -357,6 +342,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 닉네임 수정 실패 : 이미 존재하는 닉네임을 입력하면 수정에 실패하고 409 CONFLICT 를 반환한다")
+    @WithMockCustomUser
     void change_nickname_fail_for_existing_nickname() throws Exception {
         // given
         String newNickname = TEST_USER_NICKNAME;
@@ -368,7 +354,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 patch("/users/me/nickname")
-                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf())
@@ -381,6 +366,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 비밀번호 수정 성공 : 비밀번호 수정에 성공하면 200 OK 와 함께, 성공 메시지를 응답받는다")
+    @WithMockCustomUser
     void change_password_success() throws Exception {
         // given
         String newPassword = "newPassword123";
@@ -391,7 +377,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 patch("/users/me/password")
-                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf())
@@ -407,6 +392,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 비밀번호 수정 실패 : 비어있는 비밀번호로 요청을 보낼경우, @Valid 조건을 통과하지 못하여 400 BAD_REQUEST 와 에러 메시지를 반환한다")
+    @WithMockCustomUser
     void change_password_fail() throws Exception {
         // given
         String newPassword = "";
@@ -415,7 +401,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 patch("/users/me/password")
-                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf())
@@ -428,6 +413,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("프로필 이미지 변경 성공 : 유효한 이미지 파일을 업로드하면 200 OK 와 변경된 이미지 URL을 반환한다")
+    @WithMockCustomUser
     void register_new_profile_image_success() throws Exception {
         // given
         MockMultipartFile newProfileImage = new MockMultipartFile(
@@ -445,7 +431,6 @@ public class UserControllerTest {
         ResultActions result = mockMvc.perform(
                 multipart(HttpMethod.PATCH, "/users/me/profile-image")
                         .file(newProfileImage)
-                        .with(mockUser())
                         .with(csrf())
         );
 
@@ -460,6 +445,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("프로필 이미지 변경 실패 : 지원하지 않는 파일 형식을 업로드하면 400 BAD_REQUEST 를 반환한다")
+    @WithMockCustomUser
     void register_new_profile_image_fail_invalid_type() throws Exception {
         // given
         String multipartFileName = "profile_image";
@@ -472,7 +458,6 @@ public class UserControllerTest {
         ResultActions result = mockMvc.perform(
                 multipart(HttpMethod.PATCH, "/users/me/profile-image")
                         .file(newProfileImage)
-                        .with(mockUser())
                         .with(csrf())
         );
 
@@ -484,6 +469,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("프로필 이미지 삭제 성공 : 프로필 이미지를 삭제하면 200 OK 와 삭제된 이미지 URL을 반환한다")
+    @WithMockCustomUser
     void remove_profile_image_success() throws Exception {
         // given
         String deletedUrl = "/assets/images/profile/deleted.jpeg";
@@ -492,7 +478,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 delete("/users/me/profile-image")
-                        .with(mockUser())
                         .with(csrf())
         );
 
