@@ -145,22 +145,16 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("register_success"))
                 .andDo(print());
 
-        // 1. ArgumentCaptor 생성
         ArgumentCaptor<JoinRequest> joinRequestCaptor = ArgumentCaptor.forClass(JoinRequest.class);
         ArgumentCaptor<MultipartFile> multipartFileCaptor = ArgumentCaptor.forClass(MultipartFile.class);
 
-        // 2. verify 단계에서 capture() 호출하여 인자 포획
         verify(userService).register(joinRequestCaptor.capture(), multipartFileCaptor.capture());
 
-        // 3. 캡처된 값 검증
         JoinRequest capturedRequest = joinRequestCaptor.getValue();
         MultipartFile capturedFile = multipartFileCaptor.getValue();
 
-        // createDtoFile() 에서 설정한 값과 일치하는지 확인
         assertEquals("yongsu626@naver.com", capturedRequest.getEmail());
         assertEquals("robin123", capturedRequest.getNickname());
-        
-        // createImageFile() 에서 설정한 값과 일치하는지 확인
         assertEquals("profile.jpeg", capturedFile.getOriginalFilename());
     }
 
@@ -360,7 +354,11 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.data.newNickname").value(newNickname)) // 이제 data가 null이 아님
                 .andDo(print());
 
-        verify(userService).changeNickname(eq(TEST_USER_ID), any(NicknameUpdateRequest.class));
+        ArgumentCaptor<NicknameUpdateRequest> captor = ArgumentCaptor.forClass(NicknameUpdateRequest.class);
+        verify(userService).changeNickname(eq(TEST_USER_ID), captor.capture());
+
+        NicknameUpdateRequest capturedDto = captor.getValue();
+        assertEquals(newNickname, capturedDto.getNewNickname());
     }
 
     @Test
@@ -411,7 +409,11 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("password_edit_success"))
                 .andDo(print());
 
-        verify(userService).changePassword(eq(TEST_USER_ID), any(PasswordUpdateRequest.class));
+        ArgumentCaptor<PasswordUpdateRequest> captor = ArgumentCaptor.forClass(PasswordUpdateRequest.class);
+        verify(userService).changePassword(eq(TEST_USER_ID), captor.capture());
+
+        PasswordUpdateRequest capturedDto = captor.getValue();
+        assertEquals(newPassword, capturedDto.getNewPassword());
     }
 
     @Test
@@ -465,7 +467,11 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.data.profileImageUrl").value(savedUrl))
                 .andDo(print());
 
-        verify(userService).changeProfileImage(eq(TEST_USER_ID), any(MultipartFile.class));
+        ArgumentCaptor<MultipartFile> captor = ArgumentCaptor.forClass(MultipartFile.class);
+        verify(userService).changeProfileImage(eq(TEST_USER_ID), captor.capture());
+
+        MultipartFile capturedFile = captor.getValue();
+        assertEquals("profile.jpeg", capturedFile.getOriginalFilename());
     }
 
     @Test
