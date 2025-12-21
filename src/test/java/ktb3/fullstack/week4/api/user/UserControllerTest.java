@@ -23,12 +23,16 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -41,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,7 +70,11 @@ public class UserControllerTest {
                     .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/availability/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().hasRole("USER")
+                    )
+                    .exceptionHandling(exception -> exception
+                            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                            .accessDeniedHandler(new AccessDeniedHandlerImpl()))
                     .build();
         }
     }
@@ -136,7 +143,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
 
@@ -173,7 +179,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
         // then
@@ -197,7 +202,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
         // then
@@ -221,7 +225,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
         // then
@@ -245,7 +248,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
         // then
@@ -270,7 +272,6 @@ public class UserControllerTest {
                 multipart(HttpMethod.POST, "/users")
                         .file(dtoFile)
                         .file(imageFile)
-                        .with(csrf())
         );
 
         // then
@@ -291,7 +292,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 get("/users/me")
-                        .with(csrf())
         );
 
         // then
@@ -315,7 +315,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 delete("/users/me")
-                        .with(csrf())
         );
 
         // then
@@ -345,7 +344,6 @@ public class UserControllerTest {
                 patch("/users/me/nickname")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
-                        .with(csrf())
         );
 
         // then
@@ -377,7 +375,6 @@ public class UserControllerTest {
                 patch("/users/me/nickname")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
-                        .with(csrf())
         );
 
         // then
@@ -401,7 +398,6 @@ public class UserControllerTest {
                 patch("/users/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
-                        .with(csrf())
         );
 
         // then
@@ -429,7 +425,6 @@ public class UserControllerTest {
                 patch("/users/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
-                        .with(csrf())
         );
 
         // then : GlobalExceptionHandler 에서 MethodArgumentNotValidException 예외를 처리하여 400 응답을 반환한다
@@ -458,7 +453,6 @@ public class UserControllerTest {
         ResultActions result = mockMvc.perform(
                 multipart(HttpMethod.PATCH, "/users/me/profile-image")
                         .file(newProfileImage)
-                        .with(csrf())
         );
 
         // then
@@ -489,7 +483,6 @@ public class UserControllerTest {
         ResultActions result = mockMvc.perform(
                 multipart(HttpMethod.PATCH, "/users/me/profile-image")
                         .file(newProfileImage)
-                        .with(csrf())
         );
 
         // then
@@ -509,7 +502,6 @@ public class UserControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 delete("/users/me/profile-image")
-                        .with(csrf())
         );
 
         // then
@@ -519,5 +511,53 @@ public class UserControllerTest {
                 .andDo(print());
 
         verify(userService).deleteProfileImage(TEST_USER_ID);
+    }
+
+    @Test
+    @DisplayName("인증 실패: 인증에 실패하면 401 Unauthorized 를 반환한다.")
+    @WithMockCustomUser
+    void authentication_fail() throws Exception {
+
+        // given
+        TestSecurityContextHolder.clearContext();
+
+        String newPassword = "newPassword123";
+        PasswordUpdateRequest dto = new PasswordUpdateRequest(newPassword);
+
+        doNothing().when(userService).changePassword(eq(TEST_USER_ID), any(PasswordUpdateRequest.class));
+
+        // when
+        ResultActions result = mockMvc.perform(
+                patch("/users/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+        );
+
+        // then
+        result.andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("인가 실패: 인가에 실패하면 403 Forbidden 를 반환한다.")
+    @WithMockCustomUser(role = FAKE_USER_ROLE)
+    void authorization_fail() throws Exception {
+
+        // given
+        String newPassword = "newPassword123";
+        PasswordUpdateRequest dto = new PasswordUpdateRequest(newPassword);
+
+        doNothing().when(userService).changePassword(eq(TEST_USER_ID), any(PasswordUpdateRequest.class));
+
+        // when
+        ResultActions result = mockMvc.perform(
+                patch("/users/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+        );
+
+        // then
+        result.andExpect(status().isForbidden())
+                .andDo(print());
     }
 }

@@ -21,6 +21,8 @@ public @interface WithMockCustomUser {
     String TEST_USER_NICKNAME = "dummyNickname123";
     String TEST_USER_ROLE = "USER";
 
+    String FAKE_USER_ROLE = "GUEST";
+
     long id() default TEST_USER_ID;
     String email() default TEST_USER_EMAIL;
     String password() default TEST_USER_PASSWORD;
