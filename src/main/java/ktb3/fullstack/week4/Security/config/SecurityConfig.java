@@ -60,7 +60,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/app/**", "/css/**", "/html/**", "/assets/**").permitAll()
 
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
 
                 .exceptionHandling(handler -> handler
