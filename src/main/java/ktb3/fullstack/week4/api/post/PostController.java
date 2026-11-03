@@ -1,14 +1,12 @@
 package ktb3.fullstack.week4.api.post;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import ktb3.fullstack.week4.Security.context.SecurityUser;
 import ktb3.fullstack.week4.config.swagger.annotation.AccessTokenExpireResponse;
 import ktb3.fullstack.week4.config.swagger.annotation.CommonErrorResponses;
 import ktb3.fullstack.week4.dto.common.ApiResponse;
-import ktb3.fullstack.week4.dto.posts.PostDetailResponse;
-import ktb3.fullstack.week4.dto.posts.PostEditRequest;
-import ktb3.fullstack.week4.dto.posts.PostListResponse;
-import ktb3.fullstack.week4.dto.posts.PostUploadRequeset;
+import ktb3.fullstack.week4.dto.posts.*;
 import ktb3.fullstack.week4.service.comments.CommentService;
 import ktb3.fullstack.week4.service.likes.LikeService;
 import ktb3.fullstack.week4.service.posts.PostService;
@@ -107,6 +105,18 @@ public class PostController implements PostApi {
             @RequestParam("content") String content) {
         commentService.addComment(user.getId(), postId, content);
         return ApiResponse.ok("comment_add_success");
+    }
+
+    @Override
+    @GetMapping("/{postId}/comments")
+    public ApiResponse<CommentListResponse> getCommentList(
+            @Parameter(hidden = true) @AuthenticationPrincipal SecurityUser user,
+            @PathVariable("postId") long postId,
+            @RequestParam(value = "modifiedBefore", required = false) String modifiedBefore,
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "limit") int limit) {
+        CommentListResponse response = commentService.getCommentList(user.getId(), postId, modifiedBefore, cursorId, limit);
+        return ApiResponse.ok(response, "comments_fetch_success");
     }
 
     @Override

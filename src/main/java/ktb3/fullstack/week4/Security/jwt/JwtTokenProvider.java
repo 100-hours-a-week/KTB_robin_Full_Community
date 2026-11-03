@@ -1,21 +1,15 @@
 package ktb3.fullstack.week4.Security.jwt;
 
 
-import lombok.Getter;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-
-import java.security.Key;
-import java.time.Instant;
-import java.util.Date;
-import java.util.Optional;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +17,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
 
 @Getter
 @Component
@@ -77,12 +75,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean validateAccessToken(String token) {
+    public boolean validateToken(String token) {
         return validate(token, accessKey);
-    }
-
-    public boolean validateRefreshToken(String token) {
-        return validate(token, refreshKey);
     }
 
     private boolean validate(String token, Key key) {
@@ -121,8 +115,7 @@ public class JwtTokenProvider {
 
     public Optional<String> resolveAccessTokenFromAuthorization(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header == null) return Optional.empty();
-        if (!header.startsWith("Bearer ")) return Optional.empty();
+        if (header == null || !header.startsWith("Bearer ")) return Optional.empty();
         String token = header.substring(7).trim();
         return token.isEmpty() ? Optional.empty() : Optional.of(token);
     }

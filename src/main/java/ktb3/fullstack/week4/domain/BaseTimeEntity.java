@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 public abstract class BaseTimeEntity {
 
     @CreatedDate
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "DATETIME(6)", nullable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "modified_at")
+    @Column(name = "modified_at", columnDefinition = "DATETIME(6)", nullable = false)
     private LocalDateTime modifiedAt;
 
     public void renewModifiedAt(LocalDateTime now) {
